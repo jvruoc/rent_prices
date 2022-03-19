@@ -6,7 +6,15 @@ Repositorio realizado para la práctica 1 de web scraping de la asignatura _Tipo
 
 ## Contenido 📦
 
+### Instalación 🔧
 
+Es necesario ejecutar el siguiente fragmento de código en el que se instalan las librerías necesarias:
+
+```
+pip install selenium
+pip install webdriver_manager
+pip install fake_useragent
+```
 
 ## Autores ✒️
 
