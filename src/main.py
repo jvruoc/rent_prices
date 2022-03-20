@@ -1,9 +1,9 @@
 from Scraper import IdSeleniumScraper
 
-url = ''
+url = 'https://www.idealista.com/en/alquiler-viviendas/madrid-madrid/'
 
 scraper = IdSeleniumScraper()
 
-scraper.connect(url)
+scraper.getContent(url)
 
 scraper.stop()
