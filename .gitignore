@@ -1,3 +1,6 @@
+# Virtuals documents
+.virtual_documents
+
 # Editors
 .vscode/
 .idea/
