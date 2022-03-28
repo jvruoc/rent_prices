@@ -1,3 +1,5 @@
+import os
+import csv
 import time
 import random
 
@@ -6,6 +8,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 
 from fake_useragent import UserAgent
 
@@ -21,6 +24,8 @@ from webdriver_manager.chrome import ChromeDriverManager as DriverManager
 
 class Scraper:
     def __init__(self):
+        self.data = []
+
         ua = UserAgent()
         userAgent = ua.random
         print("\nUser agent:\n" + userAgent + "\n")
@@ -44,27 +49,47 @@ class Scraper:
         data = []
         self.downloading = True
         while(self.downloading):
+            time.sleep(random.randint(1, 3))
+
             try:
                 myElem = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, mainID)))
                 print("Page loaded")
 
                 self._accept_cookies()
-                data = self._extract_rents()
+                self._extract_rents()
 
-                # self.changePage(buttonText)
+                self.changePage(buttonText)
             except TimeoutException:
                 print("Too much time ...")
 
-        return data
+        self.listDict2csv()
 
     def changePage(self, buttonText):
-        nextLink = self.driver.find_element_by_partial_link_text(buttonText)
+        try:
+            # nextLink = self.driver.find_element_by_partial_link_text(buttonText)
+            pageLinks = self.driver.find_elements_by_class_name('sui-MoleculePagination-item')
 
-        if(nextLink):
+            self.nextLink = pageLinks[-1].find_element(by=By.XPATH, value="./a")
+
             time.sleep(random.randint(1, 3))
-            self.driver.execute_script("arguments[0].click();", nextLink)
-        else:
+            self.driver.execute_script("arguments[0].click();", self.nextLink)
+
+        except NoSuchElementException:
             self.downloading = False
+
+    def listDict2csv(self):
+        path = './data'
+
+        isExist = os.path.exists(path)
+        if not isExist:
+          os.makedirs(path)
+
+        keys = self.data[0].keys()
+
+        with open('./data/rent_prices.csv', 'w', newline = '') as outputFile:
+            dictWriter = csv.DictWriter(outputFile, keys)
+            dictWriter.writeheader()
+            dictWriter.writerows(self.data)
 
     def stop(self):
         self.driver.close()

@@ -9,7 +9,6 @@ scraper.getContent(url, 'main-content', 'Next')
 
 url = "https://www.fotocasa.es/es/alquiler/viviendas/madrid-capital/todas-las-zonas/l"
 scraper = ScraperFotocasa()
-data = scraper.getContent(url, 'App', '')
-print(data)
+scraper.getContent(url, 'App', 'next')
 
 scraper.stop()
