@@ -58,24 +58,20 @@ class Scraper:
                 self._accept_cookies()
                 self._extract_rents()
 
+                # This variable stop the loop in the first page:
+                self.downloading = False
+                print("New page")
                 self.changePage(buttonText)
             except TimeoutException:
                 print("Too much time ...")
 
+        self.getItemData()
         self.listDict2csv()
 
     def changePage(self, buttonText):
-        try:
-            # nextLink = self.driver.find_element_by_partial_link_text(buttonText)
-            pageLinks = self.driver.find_elements_by_class_name('sui-MoleculePagination-item')
-
-            self.nextLink = pageLinks[-1].find_element(by=By.XPATH, value="./a")
-
+        if self.downloading:
             time.sleep(random.randint(1, 3))
-            self.driver.execute_script("arguments[0].click();", self.nextLink)
-
-        except NoSuchElementException:
-            self.downloading = False
+            self.driver.get(self.nextLink)
 
     def listDict2csv(self):
         path = './data'
@@ -95,4 +91,10 @@ class Scraper:
         self.driver.close()
 
     def _accept_cookies(self):
+        pass
+
+    def getItemData(self):
+        pass
+
+    def getNextPage(self):
         pass
