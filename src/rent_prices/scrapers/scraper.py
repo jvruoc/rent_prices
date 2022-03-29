@@ -4,7 +4,14 @@ import urllib3
 import backoff
 import sys
 import os
+import time
+import random
 
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 
 ## Firefox driver
 # from selenium.webdriver import Firefox as Browser
@@ -17,7 +24,7 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager as DriverManager
 
 ## Remote chrome driver
-from selenium.webdriver import Remote 
+from selenium.webdriver import Remote
 
 from utilities.proxyManager import ProxiManager
 from logger.logger import logger
@@ -43,7 +50,7 @@ class Scraper(ABC):
         logger.debug("\nUser agent:\n" + userAgent + "\n")
         self._set_driver(userAgent)
 
-        
+
 
 
     def _set_driver(self, userAgent):
@@ -78,15 +85,66 @@ class Scraper(ABC):
     def _selenium_remote_connect(self, url, capabilities={'browserName': 'chrome'} ):
         return Remote(url, capabilities)
 
-    @abstractmethod
-    def getContent(self, link, pages=-1):
-        """
-            Método a definir en la clase derivada para acceder a la url y 
-            devolver los datos uno a uno utilizando yield
+    def getContent(self, link, mainID):
+        self.driver.get(link)
 
-            Se puede ver un ejemplo en la clase scraperMock.py
-        """
-        pass
+        data = []
+        self.downloading = True
+        while(self.downloading):
+            time.sleep(random.randint(1, 3))
+
+            try:
+                myElem = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, mainID)))
+                print("Page loaded")
+
+                self._accept_cookies()
+                data = self._extract_rents()
+
+                for item in self.getItemData(data):
+                    yield item
+
+                # This variable stop the loop in the first page:
+                self.downloading = False
+                print("New page")
+                self.changePage()
+            except TimeoutException:
+                print("Too much time ...")
+
+        # self.listDict2csv(data)
 
     def end_scraping(self):
         self.driver.quit()
+
+    def changePage(self):
+        if self.downloading:
+            time.sleep(random.randint(1, 3))
+            self.driver.get(self.nextLink)
+
+    def listDict2csv(self, data):
+        path = './data'
+
+        isExist = os.path.exists(path)
+        if not isExist:
+          os.makedirs(path)
+
+        keys = self.data[0].keys()
+
+        with open('./data/rent_prices.csv', 'w', newline = '') as outputFile:
+            dictWriter = csv.DictWriter(outputFile, keys)
+            dictWriter.writeheader()
+            dictWriter.writerows(self.data)
+
+    def stop(self):
+        self.driver.close()
+
+    @abstractmethod
+    def _accept_cookies(self):
+        pass
+
+    @abstractmethod
+    def getItemData(self):
+        pass
+
+    @abstractmethod
+    def getNextPage(self):
+        pass

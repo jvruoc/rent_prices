@@ -1,4 +1,4 @@
-from scraper import *
+from .scraper import *
 
 class ScraperIdealista(Scraper):
 

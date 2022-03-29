@@ -1,4 +1,4 @@
-from scraper import *
+from .scraper import *
 
 from datetime import date
 
@@ -8,10 +8,14 @@ class ScraperFotocasa(Scraper):
     def _extract_rents(self):
         self.scrollDown()
 
+        data = []
         items = self.driver.find_elements(by=By.XPATH, value='//article[starts-with(@class, "re-CardPack")]')
         for item in items:
             rent = self.getCardData(item)
-            self.data.append(rent)
+
+            data.append(rent)
+
+        return data
 
     def _accept_cookies(self):
         buttons = self.driver.find_elements(by=By.XPATH, value="//footer[contains(@class,'Modal')]//button")
@@ -55,8 +59,8 @@ class ScraperFotocasa(Scraper):
 
         # General
         today = date.today()
-        rent['id'] = len(self.data) + 1
         rent['download-date'] = today.strftime("%d/%m/%Y")
+        rent['Source'] = "Fotocasa"
 
         # Specific
         rent['title'] = item.find_element(by=By.XPATH, value="./a").get_attribute("title")
@@ -70,8 +74,8 @@ class ScraperFotocasa(Scraper):
 
         return rent
 
-    def getItemData(self):
-        for item in self.data:
+    def getItemData(self, data):
+        for item in data:
 
             self.driver.get(item['link'])
 
@@ -101,3 +105,5 @@ class ScraperFotocasa(Scraper):
             item['Contact'] = self.driver.find_element_by_class_name('re-ContactDetail-inmoContainer-clientName').text
             item['Ref'] = self.driver.find_element_by_class_name('re-ContactDetail-referenceContainer-reference').text
             item['RefFotocasa'] = self.driver.find_element_by_class_name('re-ContactDetail-referenceContainer-reference').text
+
+            yield item
