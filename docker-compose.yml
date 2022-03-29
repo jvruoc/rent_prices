@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  selenium2:
+    container_name: 'selenium'
+    restart: always
+    image: 'selenium/standalone-chrome:3.141'
+  
+  scraper:
+    build: .
+    container_name: app
+    restart: always
+    depends_on:
+      - selenium
