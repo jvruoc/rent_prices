@@ -26,6 +26,7 @@ class ScraperFotocasa(Scraper):
     def scrollDown(self):
         articles = self.driver.find_elements(by=By.XPATH, value='//article')
         nArticles = len(articles)
+        logger.debug("Cantidad de articulos: " + str(nArticles))
 
         newNArticles = 100
 
@@ -77,7 +78,8 @@ class ScraperFotocasa(Scraper):
     def getItemData(self, data):
         for item in data:
 
-            self.driver.get(item['link'])
+            #self.driver.get(item['link'])
+            self.get_link(item['link'])
 
             featureLabels = self.driver.find_elements_by_class_name('re-DetailFeaturesList-featureLabel')
             featuresValues = self.driver.find_elements_by_class_name('re-DetailFeaturesList-featureValue')
