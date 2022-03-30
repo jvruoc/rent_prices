@@ -39,6 +39,5 @@ if __name__ == "__main__":
     if args.screenshot:
         logger.info("Grabando screenshot")
         config.store_screenshot = True
-
     main()
     sys.exit(1000)
