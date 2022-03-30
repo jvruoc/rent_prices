@@ -28,9 +28,7 @@ def main():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    ## parámetro para grabar el html
     parser.add_argument('--html', action='store_true', help='Guardar el html de la página')
-    ## parámetro para grabar una captura de la pagina
     parser.add_argument('--screenshot', action='store_true', help='Guardar una captura de la página')
     args = parser.parse_args()
 
