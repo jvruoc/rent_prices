@@ -4,6 +4,7 @@ import urllib3
 import backoff
 import sys
 import os
+import json
 import time
 import random
 
@@ -74,6 +75,7 @@ class Scraper(ABC):
             options.add_argument("no-default-browser-check")
             options.add_argument("no-first-run")
             options.add_argument("no-sandbox")
+            options.add_argument("headless")
             self.driver = Browser(executable_path = DriverManager().install(), options = options)
 
     @backoff.on_exception(
@@ -100,11 +102,11 @@ class Scraper(ABC):
                 self._accept_cookies()
                 data = self._extract_rents()
 
-                for item in self.getItemData(data):
+                for item in data:
                     yield item
 
                 # This variable stop the loop in the first page:
-                self.downloading = False
+                # self.downloading = False
                 print("New page")
                 self.changePage()
             except TimeoutException:
@@ -139,10 +141,6 @@ class Scraper(ABC):
 
     @abstractmethod
     def _accept_cookies(self):
-        pass
-
-    @abstractmethod
-    def getItemData(self):
         pass
 
     @abstractmethod

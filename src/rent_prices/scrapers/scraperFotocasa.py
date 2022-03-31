@@ -8,14 +8,35 @@ class ScraperFotocasa(Scraper):
     def _extract_rents(self):
         self.scrollDown()
 
-        data = []
-        items = self.driver.find_elements(by=By.XPATH, value='//article[starts-with(@class, "re-CardPack")]')
-        for item in items:
-            rent = self.getCardData(item)
+        time.sleep(random.randint(5, 10))
+        scripts = self.driver.find_elements(by=By.XPATH, value='//script')
 
-            data.append(rent)
+        for script in scripts:
+            if script.get_attribute('innerHTML').find('window.__INITIAL_PROPS__') > 0:
+                scriptElem = script
+                break
 
-        return data
+        splitScriptElem = scriptElem.get_attribute('innerHTML').split("window.")
+
+        items = (splitScriptElem[2].replace('__INITIAL_PROPS__ = JSON.parse("', '')
+            .replace('");', '')
+            .replace('{\\"', '{\\\'')
+            .replace('\\"}', '\\\'}')
+            .replace('[\\"', '[\\\'')
+            .replace('\\"]', '\\\']')
+            .replace(',\\"', ',\\\'')
+            .replace('\\":', '\\\':')
+            .replace(':\\"', ':\\\'')
+            .replace('\\",', '\\\',')
+            .replace('"', '')
+            .replace('\\\'', '"')
+            .replace('\'', '')
+            .replace('\\', ''))
+
+        items = json.loads(items)
+
+        for item in items["initialSearch"]["result"]["realEstates"]:
+            yield self.getCardData(item)
 
     def _accept_cookies(self):
         buttons = self.driver.find_elements(by=By.XPATH, value="//footer[contains(@class,'Modal')]//button")
@@ -47,63 +68,69 @@ class ScraperFotocasa(Scraper):
 
     def getNextPage(self):
         try:
-            pageLinks = self.driver.find_elements_by_class_name('sui-MoleculePagination-item')
+            time.sleep(random.randint(5, 10))
 
+            pageLinks = self.driver.find_elements_by_class_name('sui-MoleculePagination-item')
             self.nextLink = pageLinks[-1].find_element(by=By.XPATH, value="./a").get_attribute("href")
 
         except NoSuchElementException:
             self.downloading = False
 
     def getCardData(self, item):
-        rent = dict()
+        newDataItem = dict()
 
-        # General
-        today = date.today()
-        rent['download-date'] = today.strftime("%d/%m/%Y")
-        rent['Source'] = "Fotocasa"
+        newDataItem['zipCode'] = item['address']['zipCode']
+        newDataItem['buildingSubtype'] = item['buildingSubtype']
+        newDataItem['buildingType'] = item['buildingType']
+        newDataItem['clientAlias'] = item['clientAlias']
+        newDataItem['clientId'] = item['clientId']
+        newDataItem['clientTypeId'] = item['clientTypeId']
+        newDataItem['dateDiff'] = item['date']['diff']
+        newDataItem['dateUnit'] = item['date']['unit']
+        newDataItem['dateOriginalDiff'] = item['dateOriginal']['diff']
+        newDataItem['dateOriginalUnit'] = item['dateOriginal']['unit']
+        newDataItem['dateOriginalTimestamp'] = item['dateOriginal']['timestamp']
+        newDataItem['description'] = item['description']
 
-        # Specific
-        rent['title'] = item.find_element(by=By.XPATH, value="./a").get_attribute("title")
-        rent['link'] = item.find_element(by=By.XPATH, value="./a").get_attribute("href")
-        rent['precio'] = item.find_element(by=By.XPATH, value=".//span[@class='re-CardPrice']").text
-        rent['periodicidad'] = item.find_element(by=By.XPATH, value=".//span[@class='re-CardPricePeriodicity']").text
-        features = []
-        for f in item.find_elements(by=By.XPATH, value=".//li[@class='re-CardFeatures-feature']"):
-            features.append(f.text)
-        rent['feaures'] = features
+        for feature in item['features']:
+            newDataItem[feature['key']] = feature['value']
 
-        return rent
+        newDataItem['id'] = item['id']
+        newDataItem['isDiscarded'] = item['isDiscarded']
+        newDataItem['isHighlighted'] = item['isHighlighted']
+        newDataItem['isPackAdvancePriority'] = item['isPackAdvancePriority']
+        newDataItem['isPackBasicPriority'] = item['isPackBasicPriority']
+        newDataItem['isPackMinimalPriority'] = item['isPackMinimalPriority']
+        newDataItem['isPackPremiumPriority'] = item['isPackPremiumPriority']
+        newDataItem['isMsAdvance'] = item['isMsAdvance']
+        newDataItem['isNew'] = item['isNew']
+        newDataItem['isNewConstruction'] = item['isNewConstruction']
+        newDataItem['hasOpenHouse'] = item['hasOpenHouse']
+        newDataItem['isOpportunity'] = item['isOpportunity']
+        newDataItem['isTrackedPhone'] = item['isTrackedPhone']
+        newDataItem['isTop'] = item['isTop']
+        newDataItem['minPrice'] = item['minPrice']
 
-    def getItemData(self, data):
-        for item in data:
+        newDataItem['multimedia'] = list()
+        for multElem in item['multimedia']:
+            multimedia = dict()
+            multimedia['type'] = multElem['type']
+            multimedia['src'] = multElem['src']
 
-            self.driver.get(item['link'])
+            newDataItem['multimedia'].append(multimedia)
 
-            featureLabels = self.driver.find_elements_by_class_name('re-DetailFeaturesList-featureLabel')
-            featuresValues = self.driver.find_elements_by_class_name('re-DetailFeaturesList-featureValue')
+        newDataItem['otherFeaturesCount'] = item['otherFeaturesCount']
+        newDataItem['periodicityId'] = item['periodicityId']
+        newDataItem['price'] = item['price']
+        newDataItem['promotionId'] = item['promotionId']
+        newDataItem['promotionUrl'] = item['promotionUrl']
+        newDataItem['promotionTitle'] = item['promotionTitle']
+        newDataItem['promotionTypologiesCounter'] = item['promotionTypologiesCounter']
+        newDataItem['rawPrice'] = item['rawPrice']
+        newDataItem['realEstateAdId'] = item['realEstateAdId']
+        newDataItem['reducedPrice'] = item['reducedPrice']
+        newDataItem['subtypeId'] = item['subtypeId']
+        newDataItem['transactionTypeId'] = item['transactionTypeId']
+        newDataItem['typeId'] = item['typeId']
 
-            item['Antigüedad'] = ''
-            item['Orientación'] = ''
-            item['Mascotas'] = ''
-
-            for index in range(len(featureLabels)):
-                item[featureLabels[index].text] = featuresValues[index].text.replace('\n', '')
-
-            extras = self.driver.find_elements_by_class_name('re-DetailExtras-listItem')
-
-            if len(extras) > 0:
-                actions = ActionChains(self.driver)
-                actions.move_to_element(extras[-1]).perform()
-                item['Address'] = self.driver.find_element_by_class_name('re-DetailMap-address').text
-
-            strExtras = ''
-            for extra in extras:
-                strExtras += extra.text + ", "
-            strExtras = strExtras[:len(strExtras)-2]
-
-            item['extras'] = strExtras
-            item['Contact'] = self.driver.find_element_by_class_name('re-ContactDetail-inmoContainer-clientName').text
-            item['Ref'] = self.driver.find_element_by_class_name('re-ContactDetail-referenceContainer-reference').text
-            item['RefFotocasa'] = self.driver.find_element_by_class_name('re-ContactDetail-referenceContainer-reference').text
-
-            yield item
+        return newDataItem
