@@ -5,6 +5,13 @@ from datetime import date
 from selenium.webdriver.common.action_chains import ActionChains
 
 class ScraperFotocasa(Scraper):
+
+    def __init__(self, newPage, maxPages):
+        Scraper.__init__(self)
+
+        self.newPage = newPage
+        self.maxPages = maxPages
+
     def _extract_rents(self):
         self.scrollDown()
 
@@ -20,6 +27,7 @@ class ScraperFotocasa(Scraper):
 
         items = (splitScriptElem[2].replace('__INITIAL_PROPS__ = JSON.parse("', '')
             .replace('");', '')
+            .replace('\\\\\\"', '')
             .replace('{\\"', '{\\\'')
             .replace('\\"}', '\\\'}')
             .replace('[\\"', '[\\\'')
@@ -32,6 +40,10 @@ class ScraperFotocasa(Scraper):
             .replace('\\\'', '"')
             .replace('\'', '')
             .replace('\\', ''))
+
+        # items = re.sub('[a-zA-Z]*"', '', items)
+
+        print(splitScriptElem[2])
 
         items = json.loads(items)
 
@@ -66,7 +78,7 @@ class ScraperFotocasa(Scraper):
 
         print("Finished scroll")
 
-    def getNextPage(self):
+    def getNextPageHTML(self):
         try:
             time.sleep(random.randint(5, 10))
 
@@ -74,6 +86,13 @@ class ScraperFotocasa(Scraper):
             self.nextLink = pageLinks[-1].find_element(by=By.XPATH, value="./a").get_attribute("href")
 
         except NoSuchElementException:
+            self.downloading = False
+
+    def getNextPage(self):
+        if self.newPage < self.maxPages:
+            self.nextLink = self.link + '/' + str(self.newPage)
+            self.newPage = self.newPage  + 1
+        else:
             self.downloading = False
 
     def getCardData(self, item):

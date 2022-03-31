@@ -51,9 +51,6 @@ class Scraper(ABC):
         logger.debug("\nUser agent:\n" + userAgent + "\n")
         self._set_driver(userAgent)
 
-
-
-
     def _set_driver(self, userAgent):
 
         SELENIUM_URL = "selenium:4444"
@@ -88,6 +85,7 @@ class Scraper(ABC):
         return Remote(url, capabilities)
 
     def getContent(self, link, mainID):
+        self.link = link
         self.driver.get(link)
 
         data = []
@@ -107,7 +105,6 @@ class Scraper(ABC):
 
                 # This variable stop the loop in the first page:
                 # self.downloading = False
-                print("New page")
                 self.changePage()
             except TimeoutException:
                 print("Too much time ...")
@@ -119,6 +116,8 @@ class Scraper(ABC):
 
     def changePage(self):
         if self.downloading:
+            print("\n\nNew page:")
+            print(self.nextLink)
             time.sleep(random.randint(1, 3))
             self.driver.get(self.nextLink)
 
