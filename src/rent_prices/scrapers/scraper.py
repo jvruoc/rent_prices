@@ -6,6 +6,7 @@ import urllib3
 import backoff
 import sys
 import os
+import json
 import time
 import random
 
@@ -53,9 +54,6 @@ class Scraper(ABC):
         logger.debug("\nUser agent:\n" + userAgent + "\n")
         self._set_driver(userAgent)
 
-
-
-
     def _set_driver(self, userAgent):
 
         SELENIUM_URL = "selenium:4444"
@@ -77,6 +75,7 @@ class Scraper(ABC):
             options.add_argument("no-default-browser-check")
             options.add_argument("no-first-run")
             options.add_argument("no-sandbox")
+            options.add_argument("headless")
             self.driver = Browser(executable_path = DriverManager().install(), options = options)
             # Es el tamaño de la ventana que abre el webdriver en remoto
             # Lo igualamos para que el renderizado de la página sea igual
@@ -93,6 +92,8 @@ class Scraper(ABC):
         return Remote(url, capabilities)
 
     def getContent(self, link, mainID):
+
+        self.link = link
         #self.driver.get(link)
         self.get_link(link)
 
@@ -108,12 +109,11 @@ class Scraper(ABC):
                 self._accept_cookies()
                 data = self._extract_rents()
 
-                for item in self.getItemData(data):
+                for item in data:
                     yield item
 
                 # This variable stop the loop in the first page:
-                self.downloading = False
-                print("New page")
+                # self.downloading = False
                 self.changePage()
             except TimeoutException:
                 print("Too much time ...")
@@ -125,6 +125,8 @@ class Scraper(ABC):
 
     def changePage(self):
         if self.downloading:
+            print("\n\nNew page:")
+            print(self.nextLink)
             time.sleep(random.randint(1, 3))
             #self.driver.get(self.nextLink)
             self.get_link(self.nextLink)
@@ -174,10 +176,6 @@ class Scraper(ABC):
 
     @abstractmethod
     def _accept_cookies(self):
-        pass
-
-    @abstractmethod
-    def getItemData(self):
         pass
 
     @abstractmethod

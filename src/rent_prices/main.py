@@ -18,6 +18,7 @@ scraper.getContent(url, 'main-content', 'Next')
 def main():
     logger.info("Se inicia scraping")
 
+
     url = "https://www.fotocasa.es/es/alquiler/viviendas/madrid-capital/todas-las-zonas/l"
     scraper = ScraperFotocasa()
     for item in scraper.getContent(url, 'App'):

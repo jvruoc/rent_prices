@@ -25,9 +25,54 @@ A lo largo del proyecto se han solventado diversas tareas las cuales están refl
 
 Después de todo el desarrollo aplicado podemos ver el resultado que obtenemos hasta el momento (elemento de ejemplo obtenido con el programa):
 
+```json
+{
+    "download-date": "29/03/2022",
+    "Source": "Fotocasa",
+    "title": "Piso de alquiler en ...",
+    "link": "https: //www.fotocasa.es/es/alquiler/vivienda/madrid-capital/aire-acondicionado-calefaccion-ascensor-amueblado-television-internet/162096792/d",
+    "precio": "6.550 € /mes",
+    "periodicidad": "/mes",
+    "feaures": [],
+    "Antigüedad": "+ 100 años",
+    "Orientación": "Sur",
+    "Mascotas": "",
+    "Tipo de inmueble": "Piso",
+    "Agua caliente": "Gas Natural",
+    "Calefacción": "Gas Natural",
+    "Estado": "Casi nuevo",
+    "Planta": "1ª planta",
+    "Ascensor": "Sí",
+    "Amueblado": "Sí",
+    "Gastos de comunidad": "Sí",
+    "Consumo energía": "D107 kW h m² / año",
+    "Emisiones": "D23 kg CO₂ m² / año",
+    "Address": "...",
+    "extras": "Aire acondicionado, Armarios, Gres ...",
+    "Contact": "ALFEREZ REAL ESTATE",
+    "Ref": "AC-MA-0158",
+    "RefFotocasa": "AC-MA-0158"
+}
 ```
-{'download-date': '29/03/2022', 'Source': 'Fotocasa', 'title': 'Piso de alquiler en ...', 'link': 'https://www.fotocasa.es/es/alquiler/vivienda/madrid-capital/aire-acondicionado-calefaccion-ascensor-amueblado-television-internet/162096792/d', 'precio': '6.550 € /mes', 'periodicidad': '/mes', 'feaures': [], 'Antigüedad': '+ 100 años', 'Orientación': 'Sur', 'Mascotas': '', 'Tipo de inmueble': 'Piso', 'Agua caliente': 'Gas Natural', 'Calefacción': 'Gas Natural', 'Estado': 'Casi nuevo', 'Planta': '1ª planta', 'Ascensor': 'Sí', 'Amueblado': 'Sí', 'Gastos de comunidad': 'Sí', 'Consumo energía': 'D107 kW h m² / año', 'Emisiones': 'D23 kg CO₂ m² / año', 'Address': '...', 'extras': 'Aire acondicionado, Armarios, Gres Cerámica, Parquet, Cocina Office, Suite - con baño, Electrodomésticos, Horno, Lavadora, Microondas, Nevera, Serv. portería, TV, Balcón, Internet, Lavadero, Baño de huéspedes, Cocina Equipada', 'Contact': 'ALFEREZ REAL ESTATE', 'Ref': 'AC-MA-0158', 'RefFotocasa': 'AC-MA-0158'}
-```
+
+
+## Objetivo del proyecto 🚀
+
+
+Se recogerá la información de la web de Fotocasa, extrayendo los datos de los apartamentos que se encuentran en alquiler. Los datos de estos apartamentos se incluirán en una BBDD de MongoDB y las imágenes publicadas para cada anuncio se descargarán en una unidad de Google Drive.
+
+El proceso se ejecutará diariamente para poder obtener la evolución de los precios de alquiler de un inmueble e intentar determinar el tiempo que está publicado cada uno de los anuncios. 
+
+![](pdf/images/arquitectura.svg)
+
+
+
+La aplicación está preparada para su ejecución en docker a través del `webdriver remote` de selenium.
+
+Se crea un contenedor que contiene la applicación construida (`scraper`), que accede a otro contenedor con Selenium instalado (`selenium/standalone-chrome:3.141`).
+
+El contenedor de Selenium incluye todos los componentes necesarios para el acceso a páginas web sin necesidad de instalar ningún navegador en el servidor, y al utilizarlo de forma conjunta con el contenedor de la aplicación, se puede ejecutar de forma sencilla en cualquier dipositivo.
+
 
 ## Contenido 📦
 
