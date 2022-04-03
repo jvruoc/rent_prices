@@ -13,7 +13,7 @@ scraper.getContent(url, 'main-content', 'Next')
 logger.info("Se inicia scraping")
 
 url = "https://www.fotocasa.es/es/alquiler/viviendas/madrid-capital/todas-las-zonas/l"
-scraper = ScraperFotocasa()
+scraper = ScraperFotocasa(2, 192)
 for item in scraper.getContent(url, 'App'):
     print(item)
 
