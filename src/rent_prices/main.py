@@ -13,9 +13,9 @@ scraper.getContent(url, 'main-content', 'Next')
 logger.info("Se inicia scraping")
 
 url = "https://www.fotocasa.es/es/alquiler/viviendas/madrid-capital/todas-las-zonas/l"
-scraper = ScraperFotocasa(2, 192)
+scraper = ScraperFotocasa(newPage = 2, maxPages = 192)
 for item in scraper.getContent(url, 'App'):
-    print(item)
+    pass # print(item)
 
 scraper.end_scraping()
 logger.info("Scraping finalizado")

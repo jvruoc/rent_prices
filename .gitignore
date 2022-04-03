@@ -1,6 +1,7 @@
 # Generated files
 data/
 src/images/
+client_secrets.json
 
 # Virtuals documents
 .virtual_documents

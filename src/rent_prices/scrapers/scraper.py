@@ -11,6 +11,9 @@ import random
 import requests
 import shutil
 
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -46,13 +49,19 @@ class Scraper(ABC):
         en esta clase
     """
 
-    def __init__(self, proxi_manager=None):
+    def __init__(self, googleFolder = None, proxi_manager=None):
 
         ua = UserAgent()
         userAgent = ua.random
         logger.debug("*************************************")
         logger.debug("\nUser agent:\n" + userAgent + "\n")
         self._set_driver(userAgent)
+
+        self.googleFolder = googleFolder
+
+        if self.googleFolder != None:
+            gauth = GoogleAuth()
+            self.gdrive = GoogleDrive(gauth)
 
     def _set_driver(self, userAgent):
 
@@ -110,7 +119,7 @@ class Scraper(ABC):
                 # self.downloading = False
                 self.changePage()
             except TimeoutException:
-                print("Too much time ...")
+                logger.debug("Too much time ...")
 
         # self.listDict2csv(data)
 
@@ -119,30 +128,44 @@ class Scraper(ABC):
 
     def changePage(self):
         if self.downloading:
-            print("\n\nNew page:")
-            print(self.nextLink)
+            logger.debug("New page:")
+            logger.debug(self.nextLink)
             time.sleep(random.randint(1, 3))
             self.driver.get(self.nextLink)
 
     def downloadImage(self, folder, link):
-        print(link)
-
         filename = re.sub('\.jpg.*', '.jpg', link.split("/")[-1])
 
-        if not os.path.exists('./images/' + str(folder)):
-            os.makedirs('./images/' + str(folder))
+        if not os.path.exists('./images/'):
+            os.makedirs('./images/')
 
         r = requests.get(link, stream = True)
 
         if r.status_code == 200:
             r.raw.decode_content = True
 
-            with open('./images/' + str(folder) + '/' + filename, 'wb') as f:
+            imagePath = './images/' + str(folder) + '_' + filename
+
+            with open(imagePath, 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
 
-            print('Image downloaded: ', filename)
+            logger.debug('Image downloaded: ' + imagePath)
+
+            if self.googleFolder != None:
+                self.uploadFile(imagePath)
+
+                os.remove(imagePath)
+                logger.debug('Image deleted: ' + imagePath)
         else:
-            print('Image Couldn\'t be retreived')
+            logger.debug('Image couldn\'t be retreived')
+
+    def uploadFile(self, image):
+        gfile = self.gdrive.CreateFile({'parents': [{'id': self.googleFolder}]})
+
+        logger.debug('Image uploaded: ' + image)
+
+        gfile.SetContentFile(image)
+        gfile.Upload()
 
     def listDict2csv(self, data):
         path = './data'

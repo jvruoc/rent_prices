@@ -6,8 +6,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 class ScraperFotocasa(Scraper):
 
-    def __init__(self, newPage, maxPages):
-        Scraper.__init__(self)
+    def __init__(self, googleFolder = None, newPage = -1, maxPages = -1):
+        Scraper.__init__(self, googleFolder)
 
         self.newPage = newPage
         self.maxPages = maxPages
