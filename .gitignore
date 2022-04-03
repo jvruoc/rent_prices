@@ -1,5 +1,7 @@
 # Generated files
 data/
+html
+html/*
 
 # Virtuals documents
 .virtual_documents

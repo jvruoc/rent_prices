@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import csv
+from datetime import datetime
 from fake_useragent import UserAgent
 import urllib3
 import backoff
@@ -29,6 +31,7 @@ from selenium.webdriver import Remote
 
 from utilities.proxyManager import ProxiManager
 from logger.logger import logger
+from utilities.configuration import config
 
 
 class Scraper(ABC):
@@ -67,13 +70,17 @@ class Scraper(ABC):
         else:
             options = Options()
             options.add_argument(f'user-agent = {userAgent}')
-            options.add_argument("start-maximized")
+            options.add_argument("--headless")
             options.add_argument("disable-gpu")
             options.add_argument("no-default-browser-check")
             options.add_argument("no-first-run")
             options.add_argument("no-sandbox")
             options.add_argument("headless")
             self.driver = Browser(executable_path = DriverManager().install(), options = options)
+            # Es el tamaño de la ventana que abre el webdriver en remoto
+            # Lo igualamos para que el renderizado de la página sea igual
+            self.driver.set_window_size(1050, 882)
+
 
     @backoff.on_exception(
         backoff.expo,
@@ -85,8 +92,10 @@ class Scraper(ABC):
         return Remote(url, capabilities)
 
     def getContent(self, link, mainID):
+
         self.link = link
-        self.driver.get(link)
+        #self.driver.get(link)
+        self.get_link(link)
 
         data = []
         self.downloading = True
@@ -119,7 +128,8 @@ class Scraper(ABC):
             print("\n\nNew page:")
             print(self.nextLink)
             time.sleep(random.randint(1, 3))
-            self.driver.get(self.nextLink)
+            #self.driver.get(self.nextLink)
+            self.get_link(self.nextLink)
 
     def listDict2csv(self, data):
         path = './data'
@@ -137,6 +147,32 @@ class Scraper(ABC):
 
     def stop(self):
         self.driver.close()
+
+    def get_link(self, link):
+        logger.info(f"descarga de link: {link}")
+        self.driver.get(link)
+        date_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        if config.store_html or config.store_screenshot:
+            path_file="./html"
+            if 'PATH_TO_HTML' in os.environ:
+                path_file = os.environ['PATH_TO_HTML']
+            file_name = os.path.join(path_file, date_time)
+
+            if not os.path.exists(path_file):
+                os.makedirs(path_file)
+
+            if config.store_html:
+                with open(file_name + ".html", "w") as f:
+                    f.write(self.driver.page_source)
+                logger.info(f"html en : {file_name+'.html'}")
+
+            if config.store_screenshot:
+                self.driver.save_screenshot(file_name + ".png")
+                logger.info(f"html en : {file_name+'.png'}")
+
+
+
 
     @abstractmethod
     def _accept_cookies(self):

@@ -59,6 +59,7 @@ class ScraperFotocasa(Scraper):
     def scrollDown(self):
         articles = self.driver.find_elements(by=By.XPATH, value='//article')
         nArticles = len(articles)
+        logger.debug("Cantidad de articulos: " + str(nArticles))
 
         newNArticles = 100
 
@@ -86,7 +87,8 @@ class ScraperFotocasa(Scraper):
             self.nextLink = pageLinks[-1].find_element(by=By.XPATH, value="./a").get_attribute("href")
 
         except NoSuchElementException:
-            self.downloading = False
+            self.downloading = Falsefrom datetime import datetime
+
 
     def getNextPage(self):
         if self.newPage < self.maxPages:

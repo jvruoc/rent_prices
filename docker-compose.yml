@@ -1,7 +1,7 @@
 version: '2'
 
 services:
-  selenium2:
+  selenium:
     container_name: 'selenium'
     restart: always
     image: 'selenium/standalone-chrome:3.141'
@@ -10,5 +10,9 @@ services:
     build: .
     container_name: app
     restart: always
+    environment:
+      - PATH_TO_HTML=/html
+    volumes:
+      - ./html:/html
     depends_on:
       - selenium
