@@ -41,10 +41,6 @@ class ScraperFotocasa(Scraper):
             .replace('\'', '')
             .replace('\\', ''))
 
-        # items = re.sub('[a-zA-Z]*"', '', items)
-
-        print(splitScriptElem[2])
-
         items = json.loads(items)
 
         for item in items["initialSearch"]["result"]["realEstates"]:
@@ -135,6 +131,9 @@ class ScraperFotocasa(Scraper):
             multimedia = dict()
             multimedia['type'] = multElem['type']
             multimedia['src'] = multElem['src']
+
+            if multimedia['type'] == 'image':
+                self.downloadImage(newDataItem['id'], multimedia['src'])
 
             newDataItem['multimedia'].append(multimedia)
 

@@ -4,9 +4,12 @@ import urllib3
 import backoff
 import sys
 import os
+import re
 import json
 import time
 import random
+import requests
+import shutil
 
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
@@ -120,6 +123,26 @@ class Scraper(ABC):
             print(self.nextLink)
             time.sleep(random.randint(1, 3))
             self.driver.get(self.nextLink)
+
+    def downloadImage(self, folder, link):
+        print(link)
+
+        filename = re.sub('\.jpg.*', '.jpg', link.split("/")[-1])
+
+        if not os.path.exists('./images/' + str(folder)):
+            os.makedirs('./images/' + str(folder))
+
+        r = requests.get(link, stream = True)
+
+        if r.status_code == 200:
+            r.raw.decode_content = True
+
+            with open('./images/' + str(folder) + '/' + filename, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+
+            print('Image downloaded: ', filename)
+        else:
+            print('Image Couldn\'t be retreived')
 
     def listDict2csv(self, data):
         path = './data'
