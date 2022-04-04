@@ -17,7 +17,8 @@ class Configuration(metaclass=Singleton):
     """
         Clase que almacena la configuración de la aplicación
     """
-    store_html: bool = False;
-    store_screenshot: bool = False;
+    store_html: bool = False
+    store_screenshot: bool = False
+    collection = None
 
 config = Configuration()

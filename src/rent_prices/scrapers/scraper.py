@@ -100,11 +100,11 @@ class Scraper(ABC):
         data = []
         self.downloading = True
         while(self.downloading):
-            time.sleep(random.randint(1, 3))
+            #time.sleep(random.randint(1, 3))
 
             try:
                 myElem = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, mainID)))
-                print("Page loaded")
+                logger.info("Page loaded")
 
                 self._accept_cookies()
                 data = self._extract_rents()
@@ -116,7 +116,7 @@ class Scraper(ABC):
                 # self.downloading = False
                 self.changePage()
             except TimeoutException:
-                print("Too much time ...")
+                logger.info("Too much time ...")
 
         # self.listDict2csv(data)
 
@@ -125,9 +125,9 @@ class Scraper(ABC):
 
     def changePage(self):
         if self.downloading:
-            print("\n\nNew page:")
-            print(self.nextLink)
-            time.sleep(random.randint(1, 3))
+            logger.debug("\n\nNew page:")
+            logger.debug(self.nextLink)
+            #time.sleep(random.randint(1, 3))
             #self.driver.get(self.nextLink)
             self.get_link(self.nextLink)
 
@@ -149,6 +149,7 @@ class Scraper(ABC):
         self.driver.close()
 
     def get_link(self, link):
+        time.sleep(random.randint(5, 10))
         logger.info(f"descarga de link: {link}")
         self.driver.get(link)
         date_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -176,6 +177,10 @@ class Scraper(ABC):
 
     @abstractmethod
     def _accept_cookies(self):
+        pass
+
+    @abstractmethod
+    def _extract_rents(self):
         pass
 
     @abstractmethod
