@@ -25,8 +25,6 @@ def main():
     for item in scraper.getContent(url, 'App'):
         logger.info(f"Grabando elemento id: {item['_id']}")
         if config.collection:
-            if item['_id'] == "fc-162706645":
-                item['price'] = 9999
             Db.insert_or_update_price('rents', item['_id'], item)        
 
     scraper.end_scraping()
