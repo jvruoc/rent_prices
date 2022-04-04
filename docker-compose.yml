@@ -16,3 +16,7 @@ services:
       - ./html:/html
     depends_on:
       - selenium
+    command:
+      - python
+      - src/rent_prices/main.py
+      - --collection=rents

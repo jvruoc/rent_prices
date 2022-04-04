@@ -1,6 +1,7 @@
 from .scraper import Scraper
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.by import By
 from logger.logger import logger
 import json
 

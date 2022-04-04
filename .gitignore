@@ -1,6 +1,6 @@
 # DB config
-dbconfig/*
-!dbconfig/template.json
+src/dbconfig/*
+!src/dbconfig/template.json
 
 # Generated files
 data/

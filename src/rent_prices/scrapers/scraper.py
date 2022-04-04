@@ -60,22 +60,22 @@ class Scraper(ABC):
 
         in_docker = os.getenv("IN_DOCKER") == "yes"
         logger.info (f"ENV IN_DOKER: {in_docker}")
+        options = Options()
+        options.add_argument(f'user-agent = {userAgent}')
+        options.add_argument("disable-gpu")
+        options.add_argument("no-default-browser-check")
+        options.add_argument("no-first-run")
+        options.add_argument("no-sandbox")
+        options.add_argument("headless")
+
         if in_docker:
             # Si no logra conectar con la instancia de Selenium finaliza la app.
             try:
-                self.driver = self._selenium_remote_connect(f"http://{SELENIUM_URL}/wd/hub")
+                self.driver = self._selenium_remote_connect(f"http://{SELENIUM_URL}/wd/hub", capabilities=options.to_capabilities())
             except urllib3.exceptions.MaxRetryError:
                 logger.error("Unable to connect to Selenium.")
                 sys.exit(1)
         else:
-            options = Options()
-            options.add_argument(f'user-agent = {userAgent}')
-            options.add_argument("--headless")
-            options.add_argument("disable-gpu")
-            options.add_argument("no-default-browser-check")
-            options.add_argument("no-first-run")
-            options.add_argument("no-sandbox")
-            options.add_argument("headless")
             self.driver = Browser(executable_path = DriverManager().install(), options = options)
             # Es el tamaño de la ventana que abre el webdriver en remoto
             # Lo igualamos para que el renderizado de la página sea igual
@@ -149,9 +149,14 @@ class Scraper(ABC):
         self.driver.close()
 
     def get_link(self, link):
-        time.sleep(random.randint(5, 10))
-        logger.info(f"descarga de link: {link}")
-        self.driver.get(link)
+        random_time = random.randint(5, 10)
+        logger.info(f"Retardo ({random_time} s.) -> descarga de link: {link}")
+        time.sleep(random_time)
+        try:
+            self.driver.get(link)
+        except Exception as e:
+            logger.error(f"Error al descargar el link: {link}")
+            raise e
         date_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         if config.store_html or config.store_screenshot:

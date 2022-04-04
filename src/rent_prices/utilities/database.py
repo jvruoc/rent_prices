@@ -23,7 +23,7 @@ class Db ():
                 "server": "mongodb.services.clever-cloud.com:27017"
                 }
         """
-        with open(os.path.join("dbconfig",filename)) as f:
+        with open(os.path.join("src", "dbconfig", filename)) as f:
             user, passw, bbdd, server = json.load(f).values()
         uri = f"mongodb+srv://{user}:{passw}@{server}"
         client = pymongo.MongoClient(uri)
