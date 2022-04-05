@@ -20,5 +20,6 @@ class Configuration(metaclass=Singleton):
     store_html: bool = False
     store_screenshot: bool = False
     collection = None
+    output_images = None
 
 config = Configuration()

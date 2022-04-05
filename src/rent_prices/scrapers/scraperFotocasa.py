@@ -3,6 +3,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from logger.logger import logger
+from utilities.configuration import config
 import json
 
 
@@ -133,8 +134,10 @@ class ScraperFotocasa(Scraper):
             multimedia = dict()
             multimedia['type'] = multElem['type']
             multimedia['src'] = multElem['src']
-
             newDataItem['multimedia'].append(multimedia)
+            if config.output_images:
+                #TODO Incluir descarga de imágenes
+                pass
 
         newDataItem['otherFeaturesCount'] = item['otherFeaturesCount']
         newDataItem['periodicityId'] = item['periodicityId']

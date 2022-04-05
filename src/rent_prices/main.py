@@ -21,7 +21,7 @@ def main():
 
     Db.initialize('mongo-atlas.json')
     url = "https://www.fotocasa.es/es/alquiler/viviendas/madrid-capital/todas-las-zonas/l"
-    scraper = ScraperFotocasa(2, 192)
+    scraper = ScraperFotocasa(192, 194)
     for item in scraper.getContent(url, 'App'):
         logger.info(f"Grabando elemento id: {item['_id']}")
         if config.collection:
@@ -35,6 +35,7 @@ if __name__ == "__main__":
     parser.add_argument('--html', action='store_true', help='Guardar el html de la página')
     parser.add_argument('--screenshot', action='store_true', help='Guardar una captura de la página')
     parser.add_argument('--collection', help='Graba en la colección mongo especificada')
+    parser.add_argument('--output_images', help='Directorio para guardar las imágenes')
     args = parser.parse_args()
 
     if args.html:
@@ -48,5 +49,9 @@ if __name__ == "__main__":
     if args.collection:
         config.collection = args.collection
         logger.info("Los datos se gardan en la colección", config.collection)
+
+    if args.output_images:
+        config.output_images = args.output_images
+        logger.info("Las imágenes se guardarán en ", config.output_images)
     main()
     sys.exit(1000)
