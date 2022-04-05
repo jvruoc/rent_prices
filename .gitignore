@@ -1,7 +1,12 @@
+# DB config
+src/dbconfig/*
+!src/dbconfig/template.json
+
 # Generated files
 data/
 src/images/
-client_secrets.json
+html
+html/*
 
 # Virtuals documents
 .virtual_documents

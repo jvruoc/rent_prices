@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import csv
+from datetime import datetime
 from fake_useragent import UserAgent
 import urllib3
 import backoff
@@ -35,6 +37,7 @@ from selenium.webdriver import Remote
 
 from utilities.proxyManager import ProxiManager
 from logger.logger import logger
+from utilities.configuration import config
 
 
 class Scraper(ABC):
@@ -49,7 +52,7 @@ class Scraper(ABC):
         en esta clase
     """
 
-    def __init__(self, googleFolder = None, proxi_manager=None):
+    def __init__(self, proxi_manager=None):
 
         ua = UserAgent()
         userAgent = ua.random
@@ -57,9 +60,7 @@ class Scraper(ABC):
         logger.debug("\nUser agent:\n" + userAgent + "\n")
         self._set_driver(userAgent)
 
-        self.googleFolder = googleFolder
-
-        if self.googleFolder != None:
+        if config.output_images:
             gauth = GoogleAuth()
             self.gdrive = GoogleDrive(gauth)
 
@@ -69,23 +70,27 @@ class Scraper(ABC):
 
         in_docker = os.getenv("IN_DOCKER") == "yes"
         logger.info (f"ENV IN_DOKER: {in_docker}")
+        options = Options()
+        options.add_argument(f'user-agent = {userAgent}')
+        options.add_argument("disable-gpu")
+        options.add_argument("no-default-browser-check")
+        options.add_argument("no-first-run")
+        options.add_argument("no-sandbox")
+        options.add_argument("headless")
+
         if in_docker:
             # Si no logra conectar con la instancia de Selenium finaliza la app.
             try:
-                self.driver = self._selenium_remote_connect(f"http://{SELENIUM_URL}/wd/hub")
+                self.driver = self._selenium_remote_connect(f"http://{SELENIUM_URL}/wd/hub", capabilities=options.to_capabilities())
             except urllib3.exceptions.MaxRetryError:
                 logger.error("Unable to connect to Selenium.")
                 sys.exit(1)
         else:
-            options = Options()
-            options.add_argument(f'user-agent = {userAgent}')
-            options.add_argument("start-maximized")
-            options.add_argument("disable-gpu")
-            options.add_argument("no-default-browser-check")
-            options.add_argument("no-first-run")
-            options.add_argument("no-sandbox")
-            options.add_argument("headless")
             self.driver = Browser(executable_path = DriverManager().install(), options = options)
+            # Es el tamaño de la ventana que abre el webdriver en remoto
+            # Lo igualamos para que el renderizado de la página sea igual
+            self.driver.set_window_size(1050, 882)
+
 
     @backoff.on_exception(
         backoff.expo,
@@ -97,17 +102,19 @@ class Scraper(ABC):
         return Remote(url, capabilities)
 
     def getContent(self, link, mainID):
+
         self.link = link
-        self.driver.get(link)
+        #self.driver.get(link)
+        self.get_link(link)
 
         data = []
         self.downloading = True
         while(self.downloading):
-            time.sleep(random.randint(1, 3))
+            #time.sleep(random.randint(1, 3))
 
             try:
                 myElem = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, mainID)))
-                print("Page loaded")
+                logger.info("Page loaded")
 
                 self._accept_cookies()
                 data = self._extract_rents()
@@ -119,7 +126,7 @@ class Scraper(ABC):
                 # self.downloading = False
                 self.changePage()
             except TimeoutException:
-                logger.debug("Too much time ...")
+                logger.info("Too much time ...")
 
         # self.listDict2csv(data)
 
@@ -128,12 +135,13 @@ class Scraper(ABC):
 
     def changePage(self):
         if self.downloading:
-            logger.debug("New page:")
+            logger.debug("\n\nNew page:")
             logger.debug(self.nextLink)
-            time.sleep(random.randint(1, 3))
-            self.driver.get(self.nextLink)
+            #time.sleep(random.randint(1, 3))
+            #self.driver.get(self.nextLink)
+            self.get_link(self.nextLink)
 
-    def downloadImage(self, folder, link):
+    def downloadImage(self, itemID, link):
         filename = re.sub('\.jpg.*', '.jpg', link.split("/")[-1])
 
         if not os.path.exists('./images/'):
@@ -144,27 +152,28 @@ class Scraper(ABC):
         if r.status_code == 200:
             r.raw.decode_content = True
 
-            imagePath = './images/' + str(folder) + '_' + filename
+            filename = str(itemID) + '-' + filename
+
+            imagePath = './images/' + filename
 
             with open(imagePath, 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
 
-            logger.debug('Image downloaded: ' + imagePath)
+            logger.debug('Image downloaded: ' + filename)
 
-            if self.googleFolder != None:
-                self.uploadFile(imagePath)
+            self.uploadFile(filename)
 
-                os.remove(imagePath)
-                logger.debug('Image deleted: ' + imagePath)
+            os.remove(imagePath)
+            logger.debug('Image deleted: ' + filename)
         else:
             logger.debug('Image couldn\'t be retreived')
 
-    def uploadFile(self, image):
-        gfile = self.gdrive.CreateFile({'parents': [{'id': self.googleFolder}]})
+    def uploadFile(self, filename):
+        gfile = self.gdrive.CreateFile({'parents': [{'id': config.output_images}], 'title' : filename})
 
-        logger.debug('Image uploaded: ' + image)
+        logger.debug('Image uploaded: ' + filename)
 
-        gfile.SetContentFile(image)
+        gfile.SetContentFile('./images/' + filename)
         gfile.Upload()
 
     def listDict2csv(self, data):
@@ -184,8 +193,41 @@ class Scraper(ABC):
     def stop(self):
         self.driver.close()
 
+    def get_link(self, link):
+        random_time = random.randint(5, 10)
+        logger.info(f"Retardo ({random_time} s.) -> descarga de link: {link}")
+        time.sleep(random_time)
+        try:
+            self.driver.get(link)
+        except Exception as e:
+            logger.error(f"Error al descargar el link: {link}")
+            raise e
+        date_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+        if config.store_html or config.store_screenshot:
+            path_file="./html"
+            if 'PATH_TO_HTML' in os.environ:
+                path_file = os.environ['PATH_TO_HTML']
+            file_name = os.path.join(path_file, date_time)
+
+            if not os.path.exists(path_file):
+                os.makedirs(path_file)
+
+            if config.store_html:
+                with open(file_name + ".html", "w") as f:
+                    f.write(self.driver.page_source)
+                logger.info(f"html en : {file_name+'.html'}")
+
+            if config.store_screenshot:
+                self.driver.save_screenshot(file_name + ".png")
+                logger.info(f"html en : {file_name+'.png'}")
+
     @abstractmethod
     def _accept_cookies(self):
+        pass
+
+    @abstractmethod
+    def _extract_rents(self):
         pass
 
     @abstractmethod

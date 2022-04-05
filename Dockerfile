@@ -1,6 +1,6 @@
 FROM python:3.9-slim-buster
 
-COPY src/ /
-RUN pip install -r requirements.txt
+COPY ./src /src
+RUN pip install -r src/requirements.txt
 ENV IN_DOCKER "yes"
-CMD ["python", "/rent_prices/testPackApp.py"]
+CMD ["python", "src/rent_prices/main.py"]
