@@ -9,7 +9,7 @@ import json
 
 class ScraperFotocasa(Scraper):
 
-    def __init__(self, newPage, maxPages):
+    def __init__(self, newPage = -1, maxPages = -1):
         Scraper.__init__(self)
 
         self.newPage = newPage
@@ -35,7 +35,6 @@ class ScraperFotocasa(Scraper):
         )
 
         items = items.encode("utf-8").decode("unicode_escape")
-        # items = re.sub('[a-zA-Z]*"', '', items)
         items = json.loads(items)["initialSearch"]["result"]["realEstates"]
 
         # incluye el historial de precios y la última fecha de actualización
@@ -134,10 +133,11 @@ class ScraperFotocasa(Scraper):
             multimedia = dict()
             multimedia['type'] = multElem['type']
             multimedia['src'] = multElem['src']
-            newDataItem['multimedia'].append(multimedia)
+
             if config.output_images:
-                #TODO Incluir descarga de imágenes
-                pass
+                self.downloadImage(newDataItem['_id'], multimedia['src'])
+
+            newDataItem['multimedia'].append(multimedia)
 
         newDataItem['otherFeaturesCount'] = item['otherFeaturesCount']
         newDataItem['periodicityId'] = item['periodicityId']
@@ -153,5 +153,3 @@ class ScraperFotocasa(Scraper):
         newDataItem['typeId'] = item['typeId']
 
         return newDataItem
-
-

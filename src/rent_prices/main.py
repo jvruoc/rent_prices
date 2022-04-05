@@ -15,7 +15,6 @@ scraper = ScraperIdealista()
 scraper.getContent(url, 'main-content', 'Next')
 '''
 
-
 def main():
     logger.info("Se inicia scraping")
 
@@ -25,7 +24,7 @@ def main():
     for item in scraper.getContent(url, 'App'):
         logger.info(f"Grabando elemento id: {item['_id']}")
         if config.collection:
-            Db.insert_or_update_price('rents', item['_id'], item)        
+            Db.insert_or_update_price('rents', item['_id'], item)
 
     scraper.end_scraping()
     logger.info("Scraping finalizado")

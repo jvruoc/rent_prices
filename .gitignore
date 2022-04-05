@@ -4,6 +4,7 @@ src/dbconfig/*
 
 # Generated files
 data/
+src/images/
 html
 html/*
 

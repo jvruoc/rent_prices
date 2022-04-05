@@ -6,9 +6,15 @@ import urllib3
 import backoff
 import sys
 import os
+import re
 import json
 import time
 import random
+import requests
+import shutil
+
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
 
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
@@ -53,6 +59,10 @@ class Scraper(ABC):
         logger.debug("*************************************")
         logger.debug("\nUser agent:\n" + userAgent + "\n")
         self._set_driver(userAgent)
+
+        if config.output_images:
+            gauth = GoogleAuth()
+            self.gdrive = GoogleDrive(gauth)
 
     def _set_driver(self, userAgent):
 
@@ -131,6 +141,41 @@ class Scraper(ABC):
             #self.driver.get(self.nextLink)
             self.get_link(self.nextLink)
 
+    def downloadImage(self, itemID, link):
+        filename = re.sub('\.jpg.*', '.jpg', link.split("/")[-1])
+
+        if not os.path.exists('./images/'):
+            os.makedirs('./images/')
+
+        r = requests.get(link, stream = True)
+
+        if r.status_code == 200:
+            r.raw.decode_content = True
+
+            filename = str(itemID) + '-' + filename
+
+            imagePath = './images/' + filename
+
+            with open(imagePath, 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+
+            logger.debug('Image downloaded: ' + filename)
+
+            self.uploadFile(filename)
+
+            os.remove(imagePath)
+            logger.debug('Image deleted: ' + filename)
+        else:
+            logger.debug('Image couldn\'t be retreived')
+
+    def uploadFile(self, filename):
+        gfile = self.gdrive.CreateFile({'parents': [{'id': config.output_images}], 'title' : filename})
+
+        logger.debug('Image uploaded: ' + filename)
+
+        gfile.SetContentFile('./images/' + filename)
+        gfile.Upload()
+
     def listDict2csv(self, data):
         path = './data'
 
@@ -176,9 +221,6 @@ class Scraper(ABC):
             if config.store_screenshot:
                 self.driver.save_screenshot(file_name + ".png")
                 logger.info(f"html en : {file_name+'.png'}")
-
-
-
 
     @abstractmethod
     def _accept_cookies(self):
