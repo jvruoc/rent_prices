@@ -1,3 +1,7 @@
+# DB config
+src/dbconfig/*
+!src/dbconfig/template.json
+
 # Generated files
 data/
 html

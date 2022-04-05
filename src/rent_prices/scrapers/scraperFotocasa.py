@@ -1,8 +1,11 @@
-from .scraper import *
-
-from datetime import date
-
+from .scraper import Scraper
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.by import By
+from logger.logger import logger
+from utilities.configuration import config
+import json
+
 
 class ScraperFotocasa(Scraper):
 
@@ -15,7 +18,9 @@ class ScraperFotocasa(Scraper):
     def _extract_rents(self):
         self.scrollDown()
 
-        time.sleep(random.randint(5, 10))
+        # El sleep solo es necesario cuando se accede a la página (get)
+        #time.sleep(random.randint(5, 10))
+
         scripts = self.driver.find_elements(by=By.XPATH, value='//script')
 
         for script in scripts:
@@ -27,27 +32,16 @@ class ScraperFotocasa(Scraper):
 
         items = (splitScriptElem[2].replace('__INITIAL_PROPS__ = JSON.parse("', '')
             .replace('");', '')
-            .replace('\\\\\\"', '')
-            .replace('{\\"', '{\\\'')
-            .replace('\\"}', '\\\'}')
-            .replace('[\\"', '[\\\'')
-            .replace('\\"]', '\\\']')
-            .replace(',\\"', ',\\\'')
-            .replace('\\":', '\\\':')
-            .replace(':\\"', ':\\\'')
-            .replace('\\",', '\\\',')
-            .replace('"', '')
-            .replace('\\\'', '"')
-            .replace('\'', '')
-            .replace('\\', ''))
+        )
 
+        items = items.encode("utf-8").decode("unicode_escape")
         # items = re.sub('[a-zA-Z]*"', '', items)
+        items = json.loads(items)["initialSearch"]["result"]["realEstates"]
 
-        print(splitScriptElem[2])
+        # incluye el historial de precios y la última fecha de actualización
+        logger.info(f"Cantidad de inmuebles en la página: {len(items)}")
 
-        items = json.loads(items)
-
-        for item in items["initialSearch"]["result"]["realEstates"]:
+        for item in items:
             yield self.getCardData(item)
 
     def _accept_cookies(self):
@@ -57,37 +51,40 @@ class ScraperFotocasa(Scraper):
             buttons[1].click()
 
     def scrollDown(self):
-        articles = self.driver.find_elements(by=By.XPATH, value='//article')
-        nArticles = len(articles)
-        logger.debug("Cantidad de articulos: " + str(nArticles))
+        # articles = self.driver.find_elements(by=By.XPATH, value='//article')
+        # nArticles = len(articles)
+        # logger.debug("Cantidad de articulos: " + str(nArticles))
 
-        newNArticles = 100
+        # newNArticles = 100
 
-        while True:
-            actions = ActionChains(self.driver)
-            actions.move_to_element(articles[-1]).perform()
+        # while True:
+        #     actions = ActionChains(self.driver)
+        #     actions.move_to_element(articles[-1]).perform()
 
-            articles = self.driver.find_elements(by=By.XPATH, value='//article')
-            newNArticles = len(articles)
+        #     articles = self.driver.find_elements(by=By.XPATH, value='//article')
+        #     newNArticles = len(articles)
 
-            if (newNArticles > nArticles):
-                nArticles = newNArticles
-            else:
-                break
+        #     if (newNArticles > nArticles):
+        #         nArticles = newNArticles
+        #     else:
+        #         break
+        #
+        # logger.info("Finished scroll")
+
 
         self.getNextPage()
 
-        print("Finished scroll")
 
     def getNextPageHTML(self):
         try:
-            time.sleep(random.randint(5, 10))
+            #Solo lo necesita el get de la página
+            #time.sleep(random.randint(5, 10))
 
             pageLinks = self.driver.find_elements_by_class_name('sui-MoleculePagination-item')
             self.nextLink = pageLinks[-1].find_element(by=By.XPATH, value="./a").get_attribute("href")
 
         except NoSuchElementException:
-            self.downloading = Falsefrom datetime import datetime
+            self.downloading = False
 
 
     def getNextPage(self):
@@ -116,7 +113,7 @@ class ScraperFotocasa(Scraper):
         for feature in item['features']:
             newDataItem[feature['key']] = feature['value']
 
-        newDataItem['id'] = item['id']
+        newDataItem['_id'] = f"fc-{item['id']}"
         newDataItem['isDiscarded'] = item['isDiscarded']
         newDataItem['isHighlighted'] = item['isHighlighted']
         newDataItem['isPackAdvancePriority'] = item['isPackAdvancePriority']
@@ -137,17 +134,18 @@ class ScraperFotocasa(Scraper):
             multimedia = dict()
             multimedia['type'] = multElem['type']
             multimedia['src'] = multElem['src']
-
             newDataItem['multimedia'].append(multimedia)
+            if config.output_images:
+                #TODO Incluir descarga de imágenes
+                pass
 
         newDataItem['otherFeaturesCount'] = item['otherFeaturesCount']
         newDataItem['periodicityId'] = item['periodicityId']
-        newDataItem['price'] = item['price']
+        newDataItem['price'] = item['rawPrice']
         newDataItem['promotionId'] = item['promotionId']
         newDataItem['promotionUrl'] = item['promotionUrl']
         newDataItem['promotionTitle'] = item['promotionTitle']
         newDataItem['promotionTypologiesCounter'] = item['promotionTypologiesCounter']
-        newDataItem['rawPrice'] = item['rawPrice']
         newDataItem['realEstateAdId'] = item['realEstateAdId']
         newDataItem['reducedPrice'] = item['reducedPrice']
         newDataItem['subtypeId'] = item['subtypeId']
@@ -155,3 +153,5 @@ class ScraperFotocasa(Scraper):
         newDataItem['typeId'] = item['typeId']
 
         return newDataItem
+
+
