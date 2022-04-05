@@ -9,11 +9,11 @@ import json
 
 class ScraperFotocasa(Scraper):
 
-    def __init__(self, newPage = -1, maxPages = -1):
+    def __init__(self):
         Scraper.__init__(self)
 
-        self.newPage = newPage
-        self.maxPages = maxPages
+        self.newPage = 2
+        self.maxPages = -1
 
     def _extract_rents(self):
         self.scrollDown()
@@ -50,47 +50,43 @@ class ScraperFotocasa(Scraper):
             buttons[1].click()
 
     def scrollDown(self):
-        # articles = self.driver.find_elements(by=By.XPATH, value='//article')
-        # nArticles = len(articles)
-        # logger.debug("Cantidad de articulos: " + str(nArticles))
+        articles = self.driver.find_elements(by=By.XPATH, value='//article')
+        nArticles = len(articles)
 
-        # newNArticles = 100
+        newNArticles = 100
 
-        # while True:
-        #     actions = ActionChains(self.driver)
-        #     actions.move_to_element(articles[-1]).perform()
+        while True:
+            actions = ActionChains(self.driver)
+            actions.move_to_element(articles[-1]).perform()
 
-        #     articles = self.driver.find_elements(by=By.XPATH, value='//article')
-        #     newNArticles = len(articles)
+            articles = self.driver.find_elements(by=By.XPATH, value='//article')
+            newNArticles = len(articles)
 
-        #     if (newNArticles > nArticles):
-        #         nArticles = newNArticles
-        #     else:
-        #         break
-        #
-        # logger.info("Finished scroll")
+            if (newNArticles > nArticles):
+                nArticles = newNArticles
+            else:
+                break
 
+        logger.info("Finished scroll")
 
         self.getNextPage()
 
-
-    def getNextPageHTML(self):
-        try:
-            #Solo lo necesita el get de la página
-            #time.sleep(random.randint(5, 10))
-
-            pageLinks = self.driver.find_elements_by_class_name('sui-MoleculePagination-item')
-            self.nextLink = pageLinks[-1].find_element(by=By.XPATH, value="./a").get_attribute("href")
-
-        except NoSuchElementException:
-            self.downloading = False
-
-
     def getNextPage(self):
-        if self.newPage < self.maxPages:
+        if self.maxPages <= 0:
+            self.getMaxNumPages()
+
+        if self.newPage <= self.maxPages:
             self.nextLink = self.link + '/' + str(self.newPage)
             self.newPage = self.newPage  + 1
         else:
+            self.downloading = False
+
+    def getMaxNumPages(self):
+        try:
+            pageLinks = self.driver.find_elements_by_class_name('sui-MoleculePagination-item')
+            self.maxPages = int(pageLinks[-2].text)
+
+        except NoSuchElementException:
             self.downloading = False
 
     def getCardData(self, item):

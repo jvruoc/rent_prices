@@ -135,7 +135,6 @@ class Scraper(ABC):
 
     def changePage(self):
         if self.downloading:
-            logger.debug("\n\nNew page:")
             logger.debug(self.nextLink)
             #time.sleep(random.randint(1, 3))
             #self.driver.get(self.nextLink)
