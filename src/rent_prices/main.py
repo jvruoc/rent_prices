@@ -51,6 +51,6 @@ if __name__ == "__main__":
 
     if args.output_images:
         config.output_images = args.output_images
-        logger.info("Las imágenes se guardarán en ", config.output_images)
+        logger.info("Las imágenes se guardarán en " + config.output_images)
     main()
     sys.exit(1000)
