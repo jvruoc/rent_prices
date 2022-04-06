@@ -32,7 +32,12 @@ def main():
 
     Db.initialize('mongo-atlas.json')
     url = "https://www.fotocasa.es/es/alquiler/viviendas/madrid-capital/todas-las-zonas/l"
-    scraper = ScraperFotocasa()
+    try:
+        scraper = ScraperFotocasa()
+    except Exception as e:
+        logger.exception(e)
+        sys.exit(1)
+
     for item in scraper.getContent(url, 'App'):
         logger.info(f"Grabando elemento id: {item['_id']}")
         if config.collection:

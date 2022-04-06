@@ -68,10 +68,11 @@ class ScraperFotocasa(Scraper):
         #         nArticles = newNArticles
         #     else:
         #         break
-        time.sleep(3)
+        
+        # Para que de tiempo a que carge toda la página
+        time.sleep(5)
         self.driver.execute_script("var scrollingElement = (document.scrollingElement || document.body);scrollingElement.scrollTop = scrollingElement.scrollHeight;")
         logger.info("Finished scroll")
-
 
         self.getNextPage()
 
