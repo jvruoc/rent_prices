@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from logger.logger import logger
 from utilities.configuration import config
 import json
+import time
 
 
 class ScraperFotocasa(Scraper):
@@ -67,8 +68,9 @@ class ScraperFotocasa(Scraper):
         #         nArticles = newNArticles
         #     else:
         #         break
-        #
-        # logger.info("Finished scroll")
+        time.sleep(3)
+        self.driver.execute_script("var scrollingElement = (document.scrollingElement || document.body);scrollingElement.scrollTop = scrollingElement.scrollHeight;")
+        logger.info("Finished scroll")
 
 
         self.getNextPage()
