@@ -9,11 +9,13 @@ services:
   scraper:
     build: .
     container_name: app
-    restart: always
+    restart: "no"
     environment:
       - PATH_TO_HTML=/html
     volumes:
       - ./html:/html
+      - ./logs:/logs
+      - ./src/dbconfig:/src/dbconfig
     depends_on:
       - selenium
     command:
