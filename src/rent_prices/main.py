@@ -25,15 +25,15 @@ def init_dirs():
             os.mkdir(config.output_images)
 
 
-def main():
+def main(start=0):
     init_dirs()
 
-    logger.info("Se inicia scraping")
+    logger.info(f"Se inicia scraping en la  página {start}")
 
     Db.initialize('mongo-atlas.json')
     url = "https://www.fotocasa.es/es/alquiler/viviendas/madrid-capital/todas-las-zonas/l"
     try:
-        scraper = ScraperFotocasa(179,300)
+        scraper = ScraperFotocasa(start,300)
     except Exception as e:
         logger.exception(e)
         sys.exit(1)
@@ -43,7 +43,7 @@ def main():
         if config.collection:
             Db.insert_or_update_price('rents', item['_id'], item)
 
-    scraper.end_scraping(config.start_page)
+    scraper.end_scraping()
     logger.info("Scraping finalizado")
 
 if __name__ == "__main__":
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     parser.add_argument('--screenshot', action='store_true', help='Guardar una captura de la página')
     parser.add_argument('--collection', help='Graba en la colección mongo especificada')
     parser.add_argument('--output_images', help='Directorio para guardar las imágenes')
-    parser.add_argument('--start_page', type=int, default=0, help='Número de página donde se inicia el scraping')
+    parser.add_argument('--start_page', type=int, default=2, help='Número de página donde se inicia el scraping')
     args = parser.parse_args()
 
     if args.html:
@@ -71,6 +71,4 @@ if __name__ == "__main__":
         config.output_images = args.output_images
         logger.info("Las imágenes se guardarán en " + config.output_images)
 
-    config.start_page = args.start_page
-    
-    main()
+    main(start=args.start_page)
