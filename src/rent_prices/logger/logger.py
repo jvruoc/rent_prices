@@ -1,3 +1,6 @@
+import os
+import pwd
+import grp
 # setup_logger.py
 # import logging
 # logging.basicConfig(level=logging.DEBUG)
@@ -15,6 +18,13 @@ import logging
 from logging.config import fileConfig
 from os import path
 
+if not os.path.exists('logs'):
+    os.mkdir('logs')
+# else:
+#     dir = os.path.join(os.getcwd(), 'logs')
+#     uid = pwd.getpwnam(dir).pw_uid
+#     gid = grp.getgrnam(dir).gr_gid
+#     os.chown(dir, uid, gid)
 
 log_file_path = path.join(path.dirname(path.abspath(__file__)), 'logging_config.ini')
 fileConfig(log_file_path)

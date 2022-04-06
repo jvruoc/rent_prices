@@ -15,12 +15,24 @@ scraper = ScraperIdealista()
 scraper.getContent(url, 'main-content', 'Next')
 '''
 
+def init_dirs():
+    if config.store_html or config.store_screenshot:
+        if not os.path.exists('html'):
+            os.mkdir('html')
+
+    if config.output_images:
+        if not os.path.exists(config.output_images):
+            os.mkdir(config.output_images)
+
+
 def main():
+    init_dirs()
+
     logger.info("Se inicia scraping")
 
     Db.initialize('mongo-atlas.json')
     url = "https://www.fotocasa.es/es/alquiler/viviendas/madrid-capital/todas-las-zonas/l"
-    scraper = ScraperFotocasa(192, 194)
+    scraper = ScraperFotocasa()
     for item in scraper.getContent(url, 'App'):
         logger.info(f"Grabando elemento id: {item['_id']}")
         if config.collection:
@@ -52,5 +64,5 @@ if __name__ == "__main__":
     if args.output_images:
         config.output_images = args.output_images
         logger.info("Las imágenes se guardarán en " + config.output_images)
+    
     main()
-    sys.exit(1000)
