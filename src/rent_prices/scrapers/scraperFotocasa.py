@@ -1,6 +1,7 @@
 from .scraper import Scraper
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from logger.logger import logger
 from utilities.configuration import config
@@ -10,6 +11,35 @@ import time
 
 class ScraperFotocasa(Scraper):
 
+
+
+    class script_whit_initial_props (object):
+        """
+            Esta clase espera a que exista un script
+            que contenga la variable javascript __INITIAL_PROPS__
+            y la extrae.
+
+            Se utiliza junto con la función wait para esperar
+            a que el contenido del script esté disponible.
+        """
+
+        def __init__(self, locator, var):
+            self.locator = locator
+            self.var = var
+
+        def __call__(self, driver):
+            elements = driver.find_elements(*self.locator)
+            for element in elements:
+                try:
+                    html = element.get_attribute('innerHTML')
+                    if html.find(self.var) > 0:
+                        return element
+                except:
+                    return False
+
+
+
+
     def __init__(self, newPage = -1, maxPages = -1):
         Scraper.__init__(self)
 
@@ -17,18 +47,10 @@ class ScraperFotocasa(Scraper):
         self.maxPages = maxPages
 
     def _extract_rents(self):
-        self.scrollDown()
 
-        # El sleep solo es necesario cuando se accede a la página (get)
-        #time.sleep(random.randint(5, 10))
-
-        scripts = self.driver.find_elements(by=By.XPATH, value='//script')
-
-        for script in scripts:
-            if script.get_attribute('innerHTML').find('window.__INITIAL_PROPS__') > 0:
-                scriptElem = script
-                break
-
+        # Espera hasta 10 segundo para que esté disponible la información en la página
+        wait = WebDriverWait(self.driver, 10)
+        scriptElem = wait.until(self.script_whit_initial_props((By.XPATH, '//script'), 'window.__INITIAL_PROPS__'))
         splitScriptElem = scriptElem.get_attribute('innerHTML').split("window.")
 
         items = (splitScriptElem[2].replace('__INITIAL_PROPS__ = JSON.parse("', '')
@@ -43,6 +65,9 @@ class ScraperFotocasa(Scraper):
 
         for item in items:
             yield self.getCardData(item)
+
+        self.scrollDown()
+
 
     def _accept_cookies(self):
         buttons = self.driver.find_elements(by=By.XPATH, value="//footer[contains(@class,'Modal')]//button")
@@ -70,7 +95,8 @@ class ScraperFotocasa(Scraper):
         #         break
         
         # Para que de tiempo a que carge toda la página
-        time.sleep(5)
+        # time.sleep(5)
+        # Como tenemos un wait que espera hasta que el script esté dispo
         self.driver.execute_script("var scrollingElement = (document.scrollingElement || document.body);scrollingElement.scrollTop = scrollingElement.scrollHeight;")
         logger.info("Finished scroll")
 
