@@ -34,7 +34,6 @@ class ScraperFotocasa(Scraper):
         items = (splitScriptElem[2].replace('__INITIAL_PROPS__ = JSON.parse("', '')
             .replace('");', '')
         )
-
         items = items.encode("utf-8").decode("unicode_escape")
         items = json.loads(items)["initialSearch"]["result"]["realEstates"]
 
@@ -110,7 +109,10 @@ class ScraperFotocasa(Scraper):
         newDataItem['dateOriginalDiff'] = item['dateOriginal']['diff']
         newDataItem['dateOriginalUnit'] = item['dateOriginal']['unit']
         newDataItem['dateOriginalTimestamp'] = item['dateOriginal']['timestamp']
-        newDataItem['description'] = item['description']
+
+        # En algunas descripciones vienen caracteres no válidos para utf-8.
+        # Si no se eliminan al grabar en MongoDB generan error
+        newDataItem['description'] = item['description'].encode('utf-8',errors="replace").decode("utf-8")
 
         for feature in item['features']:
             newDataItem[feature['key']] = feature['value']
