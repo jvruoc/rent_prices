@@ -109,7 +109,9 @@ class ScraperFotocasa(Scraper):
     def getMaxNumPages(self):
         try:
             pageLinks = self.driver.find_elements_by_class_name('sui-MoleculePagination-item')
-            self.maxPages = int(pageLinks[-2].text)
+
+            if len(pageLinks) > 0:
+                self.maxPages = int(pageLinks[-2].text)
 
             logger.info("Max number of pages: " + str(self.maxPages))
         except NoSuchElementException:
