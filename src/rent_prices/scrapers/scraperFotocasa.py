@@ -138,7 +138,12 @@ class ScraperFotocasa(Scraper):
 
         # En algunas descripciones vienen caracteres no válidos para utf-8.
         # Si no se eliminan al grabar en MongoDB generan error
-        newDataItem['description'] = item['description'].encode('utf-8',errors="replace").decode("utf-8")
+        # También se verifica que sea de la clase str para poder aplicar el encode
+        if isinstance(item['description'], str):
+            newDataItem['description'] = item['description'].encode('utf-8',errors="replace").decode("utf-8")
+        else:
+            newDataItem['description'] = item['description']
+        
 
         for feature in item['features']:
             newDataItem[feature['key']] = feature['value']
