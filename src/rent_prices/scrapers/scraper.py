@@ -54,6 +54,8 @@ class Scraper(ABC):
 
     def __init__(self, proxi_manager=None):
 
+        self.newPage = -1
+
         ua = UserAgent()
         userAgent = ua.random
         logger.debug("*************************************")
@@ -105,6 +107,11 @@ class Scraper(ABC):
 
         self.link = link
         #self.driver.get(link)
+
+        if self.newPage != -1:
+            link = self.link + '/' + str(self.newPage)
+            self.newPage = self.newPage + 1
+
         self.get_link(link)
 
         data = []
