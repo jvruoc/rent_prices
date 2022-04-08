@@ -3,6 +3,7 @@ src/dbconfig/*
 !src/dbconfig/template.json
 
 # Generated files
+logs/
 data/
 src/images/
 html

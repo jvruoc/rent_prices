@@ -193,7 +193,7 @@ class Scraper(ABC):
         self.driver.close()
 
     def get_link(self, link):
-        random_time = random.randint(5, 10)
+        random_time = random.randint(8, 12)
         logger.info(f"Retardo ({random_time} s.) -> descarga de link: {link}")
         time.sleep(random_time)
         try:

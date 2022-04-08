@@ -1,39 +1,60 @@
 from .scraper import Scraper
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from logger.logger import logger
 from utilities.configuration import config
 import json
+import time
 
 
 class ScraperFotocasa(Scraper):
 
-    def __init__(self):
+    class script_whit_initial_props (object):
+        """
+            Esta clase espera a que exista un script
+            que contenga la variable javascript __INITIAL_PROPS__
+            y la extrae.
+
+            Se utiliza junto con la función wait para esperar
+            a que el contenido del script esté disponible.
+        """
+
+        def __init__(self, locator, var):
+            self.locator = locator
+            self.var = var
+
+        def __call__(self, driver):
+            elements = driver.find_elements(*self.locator)
+            for element in elements:
+                try:
+                    html = element.get_attribute('innerHTML')
+                    if html.find(self.var) > 0:
+                        return element
+                except:
+                    return False
+
+    def __init__(self, newPage = -1):
         Scraper.__init__(self)
 
-        self.newPage = 2
+        if newPage == -1:
+            self.newPage = 2
+        else:
+            self.newPage = newPage
+
         self.maxPages = -1
 
     def _extract_rents(self):
-        self.scrollDown()
 
-        # El sleep solo es necesario cuando se accede a la página (get)
-        #time.sleep(random.randint(5, 10))
-
-        scripts = self.driver.find_elements(by=By.XPATH, value='//script')
-
-        for script in scripts:
-            if script.get_attribute('innerHTML').find('window.__INITIAL_PROPS__') > 0:
-                scriptElem = script
-                break
-
+        # Espera hasta 10 segundo para que esté disponible la información en la página
+        wait = WebDriverWait(self.driver, 10)
+        scriptElem = wait.until(self.script_whit_initial_props((By.XPATH, '//script'), 'window.__INITIAL_PROPS__'))
         splitScriptElem = scriptElem.get_attribute('innerHTML').split("window.")
 
         items = (splitScriptElem[2].replace('__INITIAL_PROPS__ = JSON.parse("', '')
             .replace('");', '')
         )
-
         items = items.encode("utf-8").decode("unicode_escape")
         items = json.loads(items)["initialSearch"]["result"]["realEstates"]
 
@@ -42,6 +63,9 @@ class ScraperFotocasa(Scraper):
 
         for item in items:
             yield self.getCardData(item)
+
+        self.scrollDown()
+
 
     def _accept_cookies(self):
         buttons = self.driver.find_elements(by=By.XPATH, value="//footer[contains(@class,'Modal')]//button")
@@ -67,6 +91,7 @@ class ScraperFotocasa(Scraper):
             else:
                 break
 
+        # self.driver.execute_script("var scrollingElement = (document.scrollingElement || document.body);scrollingElement.scrollTop = scrollingElement.scrollHeight;")
         logger.info("Finished scroll")
 
         self.getNextPage()
@@ -103,7 +128,15 @@ class ScraperFotocasa(Scraper):
         newDataItem['dateOriginalDiff'] = item['dateOriginal']['diff']
         newDataItem['dateOriginalUnit'] = item['dateOriginal']['unit']
         newDataItem['dateOriginalTimestamp'] = item['dateOriginal']['timestamp']
-        newDataItem['description'] = item['description']
+
+        # En algunas descripciones vienen caracteres no válidos para utf-8.
+        # Si no se eliminan al grabar en MongoDB generan error
+        # También se verifica que sea de la clase str para poder aplicar el encode
+        if isinstance(item['description'], str):
+            newDataItem['description'] = item['description'].encode('utf-8',errors="replace").decode("utf-8")
+        else:
+            newDataItem['description'] = item['description']
+
 
         for feature in item['features']:
             newDataItem[feature['key']] = feature['value']
