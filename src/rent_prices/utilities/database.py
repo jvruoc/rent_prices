@@ -42,18 +42,22 @@ class Db ():
         Db.DB[collection].insert_one(data)
 
     @staticmethod
-    def find(collection, query):
+    def find(collection, query, projection={}, limit=0):
         """
         Devuelve una lista con los documentos que cumplen con el query
 
         Args:
             collection: Nombre de la colección
             query: Diccionario con los criterios de búsqueda
+            limit: Si > 0 limita los registros a la cantidad indicada
         """
-        return Db.DB[collection].find(query)
+        if limit > 0:
+            return Db.DB[collection].find(query, projection).limit(limit)
+        else:
+            return Db.DB[collection].find(query, projection)
 
     @staticmethod
-    def find_one(collection, query):
+    def find_one(collection, query, projection={}):
         """
         Devuelve un documento que cumpla con el query
 
@@ -61,7 +65,7 @@ class Db ():
             collection: Nombre de la colección
             query: Diccionario con los criterios de búsqueda
         """
-        return Db.DB[collection].find_one(query)
+        return Db.DB[collection].find_one(query, projection)
 
     @staticmethod
     def update_one(collection, query, new_data):
