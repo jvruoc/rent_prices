@@ -61,7 +61,7 @@ Después de todo el desarrollo aplicado podemos ver el resultado que obtenemos h
 
 Se recogerá la información de la web de Fotocasa, extrayendo los datos de los apartamentos que se encuentran en alquiler. Los datos de estos apartamentos se incluirán en una BBDD de MongoDB y las imágenes publicadas para cada anuncio se descargarán en una unidad de Google Drive.
 
-El proceso se ejecutará diariamente para poder obtener la evolución de los precios de alquiler de un inmueble e intentar determinar el tiempo que está publicado cada uno de los anuncios. 
+El proceso se ejecutará diariamente para poder obtener la evolución de los precios de alquiler de un inmueble e intentar determinar el tiempo que está publicado cada uno de los anuncios.
 
 ![](pdf/images/arquitectura.svg)
 

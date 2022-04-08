@@ -33,7 +33,7 @@ def main(start=0):
     Db.initialize('mongo-atlas.json')
     url = "https://www.fotocasa.es/es/alquiler/viviendas/madrid-capital/todas-las-zonas/l"
     try:
-        scraper = ScraperFotocasa(start,300)
+        scraper = ScraperFotocasa(start)
     except Exception as e:
         logger.exception(e)
         sys.exit(1)
