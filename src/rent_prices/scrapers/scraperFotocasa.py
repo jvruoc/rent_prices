@@ -111,8 +111,9 @@ class ScraperFotocasa(Scraper):
             pageLinks = self.driver.find_elements_by_class_name('sui-MoleculePagination-item')
             self.maxPages = int(pageLinks[-2].text)
 
+            logger.info("Max number of pages: " + str(self.maxPages))
         except NoSuchElementException:
-            self.downloading = False
+            logger.info("Max number of pages not found")
 
     def getCardData(self, item):
         newDataItem = dict()

@@ -30,7 +30,7 @@ def main(start=0):
 
     logger.info(f"Se inicia scraping en la  página {start}")
 
-    # Db.initialize('mongo-atlas.json')
+    Db.initialize('mongo-atlas.json')
     url = "https://www.fotocasa.es/es/alquiler/viviendas/madrid-capital/todas-las-zonas/l"
     try:
         scraper = ScraperFotocasa(start)
