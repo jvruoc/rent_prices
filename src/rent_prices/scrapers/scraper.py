@@ -53,7 +53,7 @@ class Scraper(ABC):
         en esta clase
     """
     # Por cada columna:
-    # (Categorica, Nombre col) 
+    # (Categorica, Nombre col)
     # Para las columnas categóricas se extraerán todos los valores a un fichero
 
     _DEFAULT_COLS = [(False, "_id"),                          # Id. del inmueble
@@ -77,12 +77,12 @@ class Scraper(ABC):
                 (False, "rooms"),                        # Habitaciones
                 (False, "surface"),                      # Superficie m²
                 (False, "isHighlighted"),                # Destacado
-                (True,  "isPackPremiumPriority"),        # Anumcio Premium  
+                (True,  "isPackPremiumPriority"),        # Anumcio Premium
                 (False, "isNewConstruction"),            # Es de nueva construcción
                 (False, "hasOpenHouse"),                 # Visita libre
                 (False, "isOpportunity"),                # Es una oportunidad
                 (False, "minPrice"),                     # Precio mínimo aceptado
-                (False, "otherFeaturesCount"),           # Cantidad de características adicionales   
+                (False, "otherFeaturesCount"),           # Cantidad de características adicionales
                 (False, "price"),                        # Precio del alquiler
                 (True,  "periodicityId"),                # Periodicidad del alquiler (ver valores)
                 (False, "history"),                      # Historial de precios
@@ -148,6 +148,8 @@ class Scraper(ABC):
         if self.newPage != -1:
             link = self.link + '/' + str(self.newPage)
             self.newPage = self.newPage + 1
+        else:
+            self.newPage = 2
 
         self.get_link(link)
 
@@ -311,7 +313,7 @@ class Scraper(ABC):
             Combierte un item devuelto por este scraper en un diccionario para que se
             pueda grabar en un fichero CSV. Los cambios que realiza son:
 
-            - Elimina las claves `description` 
+            - Elimina las claves `description`
             - Convierte `multimedia` en cantidad de imágenes
             - Convierte las features en un array de strings con lascaracterísticas.
 
@@ -321,7 +323,7 @@ class Scraper(ABC):
             Retorna:
                 Diccionario con las características del item.
         """
-        
+
         ## TODO - Crear una clase item base que contenga la información del inmueble
         ## TODO - Derivar la clase base en una para cada tipo de extractor
 
@@ -351,7 +353,3 @@ class Scraper(ABC):
         """
         default_nom_cols = [col for _,col in Scraper._DEFAULT_COLS]
         return default_nom_cols
-
-
-
-

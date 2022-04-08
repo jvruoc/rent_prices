@@ -38,9 +38,7 @@ class ScraperFotocasa(Scraper):
     def __init__(self, newPage = -1):
         Scraper.__init__(self)
 
-        if newPage == -1:
-            self.newPage = 2
-        else:
+        if newPage > 1:
             self.newPage = newPage
 
         self.maxPages = -1
@@ -100,7 +98,7 @@ class ScraperFotocasa(Scraper):
         if self.maxPages <= 0:
             self.getMaxNumPages()
 
-        if self.newPage <= self.maxPages:
+        if (self.maxPages == -1) or (self.newPage <= self.maxPages):
             self.nextLink = self.link + '/' + str(self.newPage)
             self.newPage = self.newPage  + 1
         else:
