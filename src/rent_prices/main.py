@@ -52,7 +52,7 @@ if __name__ == "__main__":
     parser.add_argument('--screenshot', action='store_true', help='Guardar una captura de la página')
     parser.add_argument('--collection', help='Graba en la colección mongo especificada')
     parser.add_argument('--output_images', help='Directorio para guardar las imágenes')
-    parser.add_argument('--start_page', type=int, default=2, help='Número de página donde se inicia el scraping')
+    parser.add_argument('--start_page', type=int, default=1, help='Número de página donde se inicia el scraping')
     args = parser.parse_args()
 
     if args.html:
