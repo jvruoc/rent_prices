@@ -54,6 +54,8 @@ class Scraper(ABC):
 
     def __init__(self, proxi_manager=None):
 
+        self.newPage = -1
+
         ua = UserAgent()
         userAgent = ua.random
         logger.debug("*************************************")
@@ -105,10 +107,18 @@ class Scraper(ABC):
 
         self.link = link
         #self.driver.get(link)
+
+        if self.newPage != -1:
+            link = self.link + '/' + str(self.newPage)
+            self.newPage = self.newPage + 1
+
         self.get_link(link)
 
         data = []
         self.downloading = True
+
+        numTries = 0
+
         while(self.downloading):
             #time.sleep(random.randint(1, 3))
 
@@ -122,11 +132,15 @@ class Scraper(ABC):
                 for item in data:
                     yield item
 
-                # This variable stop the loop in the first page:
-                # self.downloading = False
+                numTries = 0
                 self.changePage()
             except TimeoutException:
                 logger.info("Too much time ...")
+
+                numTries = numTries + 1
+
+                if numTries > 4:
+                    self.downloading = False
 
         # self.listDict2csv(data)
 
