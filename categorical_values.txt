@@ -1,0 +1,65 @@
+buildingType
+=======================
+	[Flat]
+
+buildingSubtype
+=======================
+	[Apartment]
+	[Attic]
+	[CountryHouse]
+	[Duplex]
+	[Flat]
+	[GroundFloorWithGarden]
+	[House_Chalet]
+	[Loft]
+	[SemiDetached]
+	[SemidetachedHouse]
+	[Study]
+
+clientTypeId
+=======================
+	[1]
+	[3]
+
+balcony
+=======================
+	[1]
+
+air_conditioner
+=======================
+	[1]
+
+heater
+=======================
+	[1]
+
+heating
+=======================
+	[1]
+
+swimming_pool
+=======================
+	[1]
+
+parking
+=======================
+	[1]
+
+conservationState
+=======================
+	[1]
+	[2]
+	[3]
+	[4]
+	[8]
+
+isPackPremiumPriority
+=======================
+	[False]
+	[True]
+
+periodicityId
+=======================
+	[0]
+	[3]
+

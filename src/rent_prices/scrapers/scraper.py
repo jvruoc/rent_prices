@@ -12,6 +12,7 @@ import time
 import random
 import requests
 import shutil
+import copy
 
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
@@ -51,6 +52,42 @@ class Scraper(ABC):
         implementar el método getContent() que está definido como abstracto
         en esta clase
     """
+    # Por cada columna:
+    # (Categorica, Nombre col) 
+    # Para las columnas categóricas se extraerán todos los valores a un fichero
+
+    _DEFAULT_COLS = [(False, "_id"),                          # Id. del inmueble
+                (False, "zipCode"),                      # Código postal
+                (True,  "buildingType"),                 # Tipo de inmueble (ver valores)
+                (True,  "buildingSubtype"),              # Subtipo de inmueble (ver valores)
+                (False, "clientId"),                     # Id. del cliente
+                (True,  "clientTypeId"),                 # Tipo de cliente (ver valores)
+                (False, "dateOriginal"),                 # Fecha de publicación
+                (False, "bathrooms"),                    # Cantidad de baños
+                (True,  "balcony"),                      # Balcón
+                (True,  "air_conditioner"),               # Aire acondicionado
+                (True,  "heater"),                        # Calentador
+                (True,  "heating"),                      # Calefacción
+                (True,  "swimming_pool"),                # Piscina
+                (True,  "parking"),                      # Parking propio
+                (True,  "conservationState"),            # Estado de conservación (ver valores)
+                (False, "floor"),                        # Planta
+                (False, "terrace"),                      # Número de terrazas
+                (False, "elevator"),                     # Ascensores
+                (False, "rooms"),                        # Habitaciones
+                (False, "surface"),                      # Superficie m²
+                (False, "isHighlighted"),                # Destacado
+                (True,  "isPackPremiumPriority"),        # Anumcio Premium  
+                (False, "isNewConstruction"),            # Es de nueva construcción
+                (False, "hasOpenHouse"),                 # Visita libre
+                (False, "isOpportunity"),                # Es una oportunidad
+                (False, "minPrice"),                     # Precio mínimo aceptado
+                (False, "otherFeaturesCount"),           # Cantidad de características adicionales   
+                (False, "price"),                        # Precio del alquiler
+                (True,  "periodicityId"),                # Periodicidad del alquiler (ver valores)
+                (False, "history"),                      # Historial de precios
+                (False, "lastAccess")                    # Última fecha de acceso
+    ]
 
     def __init__(self, proxi_manager=None):
 
@@ -246,3 +283,75 @@ class Scraper(ABC):
     @abstractmethod
     def getNextPage(self):
         pass
+
+    @staticmethod
+    def generate_file_categorical_vars(cursor, file):
+        """
+            Genera un fichero con los posibles valores de las variables
+            definidas como categóricas en Scraper._DEFAULT_COLS
+
+            Argumentos:
+                cursor: Cursor con los datos de la base de datos.
+                file: Ruta del fichero donde se guardarán los valores.
+        """
+
+        with open (file, 'wt') as f:
+            for categorica, col in Scraper._DEFAULT_COLS:
+                if categorica:
+                    f.write(col + '\n')
+                    f.write("=======================\n")
+                    for value in cursor.distinct(col):
+                        f.write('\t['+str(value) + ']\n')
+                    f.write("\n")
+
+
+    @staticmethod
+    def to_csv_dict(item):
+        """
+            Combierte un item devuelto por este scraper en un diccionario para que se
+            pueda grabar en un fichero CSV. Los cambios que realiza son:
+
+            - Elimina las claves `description` 
+            - Convierte `multimedia` en cantidad de imágenes
+            - Convierte las features en un array de strings con lascaracterísticas.
+
+            Argumentos:
+                item: Item devuelto por el scraper.
+
+            Retorna:
+                Diccionario con las características del item.
+        """
+        
+        ## TODO - Crear una clase item base que contenga la información del inmueble
+        ## TODO - Derivar la clase base en una para cada tipo de extractor
+
+        item.pop('description', None)
+        item.pop('clientAlias', None)
+        multimedia = item.pop('multimedia',[])
+        item['multimedia'] = len(multimedia)
+        item['isPackPremiumPriority'] = item.get('isPackAdvancePriority', False) or \
+                                        item.get('isPackPremiumPriority', False)
+
+        item_copy = copy.deepcopy(item)
+        default_nom_cols = Scraper.get_col_names()
+        for key in item.keys():
+            if key not in default_nom_cols:
+                item_copy.pop(key, None)
+
+        return item_copy
+
+    @staticmethod
+    def get_col_names():
+        """
+            Devuelve una lista con los nombres de las columnas que se van a grabar en el fichero CSV.
+            Esta lista incluye las columnas que se definen por defecto en Scraper._DEFAULT_COLS.
+
+            Retorna:
+                Lista con los nombres de las columnas.
+        """
+        default_nom_cols = [col for _,col in Scraper._DEFAULT_COLS]
+        return default_nom_cols
+
+
+
+

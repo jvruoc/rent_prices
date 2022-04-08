@@ -8,6 +8,7 @@ data/
 src/images/
 html
 html/*
+rent*.csv
 
 # Virtuals documents
 .virtual_documents
