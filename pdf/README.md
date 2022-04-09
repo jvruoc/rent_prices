@@ -18,96 +18,83 @@ Como se puede intuir, cada elemento del conjunto representa una casa/piso de alq
 
 # 4. Representación gráfica
 
+A continuación se ve una representación del proyecto completo. Se obtienen los datos de [Fotocasa](https://www.fotocasa.es/es/) mediante Selenium y el código realizado en Python. Por un lado, guarda los datos en la base de datos, con la opción de ejecutar el posterior código para transformar estos datos en formato _CSV_ y por otro lado se puede conectar con Google Drive para guardar las imágenes en una carpeta determinada:
 
+![](https://github.com/jvruoc/rent_prices/blob/doc/pdf/images/project.png?raw=true)
 
 # 5. Contenido
 
 El dataset se encuentra formado por las siguientes características:
 
-* _**zipCode**_:
+* _**id**_: Id. del inmueble, este identificador está formado por una sección que define la plataforma de la que se obtienen los datos, y el identificador del piso. Ej: _fc-162172800_
 
-* _**buildingSubtype**_:
+* _**zipCode**_: Código postal en el que se encuentra la localidad. Ej: _28023_
 
-* _**buildingType**_:
+* _**buildingType**_: Categoría del tipo de inmueble, en la mayoría de los casos se tratan de pisos (_Flat_).
 
-* _**clientAlias**_:
+* _**buildingSubtype**_: Subtipo de inmueble, valor categórico. Ej: _GroundFloorWithGarden_, _Flat_, _SemiDetached_, _Attic_, ...
 
-* _**clientId**_:
+* _**clientId**_: Id. del cliente. Ej: _9202750766581_
 
-* _**clientTypeId**_:
+* _**clientTypeId**_: Categoría del tipo de cliente (_1_ ó _3_).
 
-* _**dateDiff**_:
+* _**dateOriginal**_: Fecha de publicación del inmueble. Ej: _2022-03-01_
 
-* _**dateUnit**_:
+* _**bathrooms**_: Cantidad de baños (valor numérico). Ej: _2_
 
-* _**dateOriginalDiff**_:
+* _**balcony**_: Balcón, valor binario tiene o no tiene este extra (_0_ ó _1_).
 
-* _**dateOriginalUnit**_:
+* _**air_conditioner**_: Aire acondicionado, valor binario tiene o no tiene este extra (_0_ ó _1_).
 
-* _**dateOriginalTimestamp**_:
+* _**heater**_: Calentador, valor binario tiene o no tiene este extra (_0_ ó _1_).
 
-* _**description**_:
+* _**heating**_: Calefacción, valor binario tiene o no tiene este extra (_0_ ó _1_).
 
-* _**_id**_:
+* _**swimming_pool**_: Piscina, valor binario tiene o no tiene este extra (_0_ ó _1_).
 
-* _**isDiscarded**_:
+* _**parking**_: Parking propio, valor binario tiene o no tiene este extra (_0_ ó _1_).
 
-* _**isHighlighted**_:
+* _**conservationState**_: Estado de conservación valor categórico (1, 2, 3, 4, ó 8).
 
-* _**isPackAdvancePriority**_:
+* _**floor**_: Planta en la que se sitúa el piso. Ej: _4_
 
-* _**isPackBasicPriority**_:
+* _**terrace**_: Terrazas, valor binario tiene o no tiene este extra (_0_ ó _1_).
 
-* _**isPackMinimalPriority**_:
+* _**elevator**_: Ascensores, valor binario tiene o no tiene este extra (_0_ ó _1_).
 
-* _**isPackPremiumPriority**_:
+* _**rooms**_: Número de habitaciones. Ej: _3_
 
-* _**isMsAdvance**_:
+* _**surface**_: Superficie de la vivienda en m². Ej: _102_
 
-* _**isNew**_:
+* _**isHighlighted**_: Valor binario que define si el inmueble está destacado o no (_True_ ó _False_).
 
-* _**isNewConstruction**_:
+* _**isPackPremiumPriority**_: Anuncio premium, valor binario (_True_ ó _False_).
 
-* _**hasOpenHouse**_:
+* _**isNewConstruction**_: Es de nueva construcción, valor binario (_True_ ó _False_).
 
-* _**isOpportunity**_:
+* _**hasOpenHouse**_: Visita libre, valor binario (_True_ ó _False_).
 
-* _**isTrackedPhone**_:
+* _**isOpportunity**_: Es una oportunidad, valor binario (_True_ ó _False_).
 
-* _**isTop**_:
+* _**minPrice**_: Precio mínimo aceptado. Ej: _0_
 
-* _**minPrice**_:
+* _**otherFeaturesCount**_: Cantidad de características adicionales, valor numérico. Ej: _15_
 
-* _**multimedia**_:
+* _**price**_: Precio del alquiler. Ej: _1325_
 
-* _**otherFeaturesCount**_:
+* _**periodicityId**_: Periodicidad del alquiler variable categórica (_1_ ó _3_).
 
-* _**periodicityId**_:
+* _**history**_: Historial de precios del inmueble. Ej: _[{'date': '2022-04-04', 'price': 1120}]_
 
-* _**price**_:
+* _**lastAccess**_: Última fecha de acceso a la obtención de los datos. Ej: _2022-04-09 16:55:15.693000_
 
-* _**promotionId**_:
+Además se ha trabajado con las imágenes aunque no se haya unificado con el conjunto de datos por motivos de almacenamiento:
 
-* _**promotionUrl**_:
-
-* _**promotionTitle**_:
-
-* _**promotionTypologiesCounter**_:
-
-* _**realEstateAdId**_:
-
-* _**reducedPrice**_:
-
-* _**subtypeId**_:
-
-* _**transactionTypeId**_:
-
-* _**typeId**_:
-
+![](https://github.com/jvruoc/rent_prices/blob/master/pdf/images/downloaded%20examples/fc-162706645-466660935.jpg?raw=true)
 
 # 6. Agradecimientos
 
-Específicamente el conjunto de datos obtenido se ha generado, como se comento en secciones anteriores, de la plataforma de venta y alquiler de viviendas [Fotocasa](https://www.fotocasa.es/es/). Gracias al enfoque de servicios que presenta nos ha permitido definir diversas características para obtener todos los datos mediante técnicas de scraping y conseguir obtener el conjunto de datos aquí presente. Siguiendo los modelos que presentan este tipo de plataformas para anonimizar su localización dentro de los datos recolectados se han obviado algunos como podrían ser cualquier aspecto con el que se pueda obtener la dirección real del establecimiento. Todo con el fin de que esto no pueda generar ningún problema al proceso de alquiler o al actual propietario. A parte de este tipo de información el resto de atributos se consideran dentro de los principios éticos y legales del contexto del proyecto.
+Específicamente el conjunto de datos obtenido se ha generado, como se comentó en secciones anteriores, de la plataforma de venta y alquiler de viviendas [Fotocasa](https://www.fotocasa.es/es/). Gracias al enfoque de servicios que presenta nos ha permitido definir diversas características para obtener todos los datos mediante técnicas de scraping y conseguir obtener el conjunto de datos aquí presente. Siguiendo los modelos que presentan este tipo de plataformas para anonimizar su localización dentro de los datos recolectados se han obviado algunos como podrían ser cualquier aspecto con el que se pueda obtener la dirección real del establecimiento. Todo con el fin de que esto no pueda generar ningún problema al proceso de alquiler o al actual propietario. A parte de este tipo de información el resto de atributos se consideran dentro de los principios éticos y legales del contexto del proyecto.
 
 # 7. Inspiración
 
@@ -133,12 +120,13 @@ En este apartado se reflejan las contribuciones realizadas por cada uno de los a
 
 | Contribución| Firma|
 |-------------------|-------------|
-| Investigación previa |  |
-| Redacción de las respuestas |  |
-| Desarrollo del código: |  |
-|  - User-agent aleatorio |  |
-|  - Pruebas con proxys |  |
-|  - Descarga de imágenes |  |
-|  - Obtención de características |  |
-| Dockerización de la aplicación |  |
-| Base de datos MongoDB Atlas |  |
+| Investigación previa | V. R., J. - M.Ch., K. |
+| Redacción de las respuestas | M.Ch., K. - V. R., J. |
+| Desarrollo del código: |
+|  - User-agent aleatorio | M.Ch., K. |
+|  - Pruebas con proxys | V. R., J. |
+|  - Gestión de elementos dinámicos | M.Ch., K. - V. R., J. |
+|  - Descarga de imágenes y subida a Google Drive | M.Ch., K. |
+|  - Obtención de características | M.Ch., K. - V. R., J. |
+| Base de datos MongoDB Atlas (carga y extracción) | V. R., J. |
+| Dockerización de la aplicación | V. R., J. |
