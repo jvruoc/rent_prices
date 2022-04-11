@@ -121,7 +121,7 @@ El código para generar el correspondiente conjunto de datos se ha realizado med
 
 # 10. Dataset
 
-Finalmente, el resultado final del dataset se puede encontrar en Zenodo a través del siguiente [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6445011.svg)](https://doi.org/10.5281/zenodo.6445011)
+Finalmente, el resultado final del dataset se puede encontrar en Zenodo a través de <a href="https://doi.org/10.5281/zenodo.6445011"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6445011.svg" alt="DOI"></a>
 
 # 11. Contribuciones
 
