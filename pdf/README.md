@@ -4,7 +4,7 @@ El presente documento refleja los puntos principales de la realización de la pr
 
 # 1. Contexto
 
-El contexto de esta práctica se basa en el estudio y el análisis del estado de la situación actual del alquiler, ya que, como se ha vivido en los últimos años existe una gran demanda ligado a su correspondiente aumento de precios. Para esto se ha trabajado con la web [Fotocasa](https://www.fotocasa.es/es/) a través de la herramienta Selenium y centrándonos exclusivamente en Madrid.
+El contexto de esta práctica se basa en el estudio y el análisis del estado de la situación actual del alquiler, ya que, como se ha vivido en los últimos años existe una gran demanda ligado a su correspondiente aumento de precios. Para esto se ha trabajado con la web [Fotocasa](https://www.fotocasa.es/es/) a través de la herramienta Selenium y centrándonos exclusivamente en la ciudad de Madrid.
 
 A pesar de centrarnos solamente en la web [Fotocasa](https://www.fotocasa.es/es/) todo el código desarrollado se ha enfocado para extrapolar la metodología aplicada a otras web con similar contexto.
 
@@ -20,13 +20,13 @@ Como se puede intuir, cada elemento del conjunto representa una casa/piso de alq
 
 A continuación se ve una representación del proyecto completo. Se obtienen los datos de [Fotocasa](https://www.fotocasa.es/es/) mediante Selenium y el código realizado en Python. Por un lado, guarda los datos en la base de datos, con la opción de ejecutar el posterior código para transformar estos datos en formato _CSV_ y por otro lado se puede conectar con Google Drive para guardar las imágenes en una carpeta determinada:
 
-![](https://github.com/jvruoc/rent_prices/blob/doc/pdf/images/project.png?raw=true)
+![](https://github.com/jvruoc/rent_prices/blob/doc/pdf/images/project.svg?raw=true)
 
 # 5. Contenido
 
 El dataset se encuentra formado por las siguientes características:
 
-* _**id**_: Id. del inmueble, este identificador está formado por una sección que define la plataforma de la que se obtienen los datos, y el identificador del piso. Ej: _fc-162172800_
+* _**id**_: Id. del inmueble, este identificador está anonimizado para que no se pueda asociar al anuncio de origen
 
 * _**zipCode**_: Código postal en el que se encuentra la localidad. Ej: _28023_
 
@@ -34,9 +34,11 @@ El dataset se encuentra formado por las siguientes características:
 
 * _**buildingSubtype**_: Subtipo de inmueble, valor categórico. Ej: _GroundFloorWithGarden_, _Flat_, _SemiDetached_, _Attic_, ...
 
-* _**clientId**_: Id. del cliente. Ej: _9202750766581_
+* _**clientId**_: Id. del cliente que publica el anuncio. Ej: id-1, id-2, ... 
 
-* _**clientTypeId**_: Categoría del tipo de cliente (_1_ ó _3_).
+* _**clientTypeId**_: Categoría del tipo de cliente
+  * 1: Particular
+  * 3: Inmobiliaria
 
 * _**dateOriginal**_: Fecha de publicación del inmueble. Ej: _2022-03-01_
 
@@ -54,7 +56,12 @@ El dataset se encuentra formado por las siguientes características:
 
 * _**parking**_: Parking propio, valor binario tiene o no tiene este extra (_0_ ó _1_).
 
-* _**conservationState**_: Estado de conservación valor categórico (1, 2, 3, 4, ó 8).
+* _**conservationState**_: Estado de conservación valor categórico:
+  * 1: Casi nuevo
+  * 2: Muy bueno
+  * 3: Bueno
+  * 4: A reformar
+  * 8: Reformado
 
 * _**floor**_: Planta en la que se sitúa el piso. Ej: _4_
 
@@ -82,7 +89,9 @@ El dataset se encuentra formado por las siguientes características:
 
 * _**price**_: Precio del alquiler. Ej: _1325_
 
-* _**periodicityId**_: Periodicidad del alquiler variable categórica (_1_ ó _3_).
+* _**periodicityId**_: Periodicidad de pago del alquiler.
+  * 0: Desconocido
+  * 3: Mensual
 
 * _**history**_: Historial de precios del inmueble. Ej: _[{'date': '2022-04-04', 'price': 1120}]_
 
@@ -112,7 +121,7 @@ El código para generar el correspondiente conjunto de datos se ha realizado med
 
 # 10. Dataset
 
-Finalmente, el resultado final del dataset se puede encontrar en Zenodo a través del siguiente [enlace del DOI]().
+Finalmente, el resultado final del dataset se puede encontrar en Zenodo a través del siguiente [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6445011.svg)](https://doi.org/10.5281/zenodo.6445011)
 
 # 11. Contribuciones
 

@@ -57,6 +57,17 @@ class Db ():
             return Db.DB[collection].find(query, projection)
 
     @staticmethod
+    def agg(collection, pipeline):
+        """
+        Devuelve el cursor resultante del pipeline de entrada
+
+        Args:
+            collection: Nombre de la colección
+            pipeline: Pipeline de Mongo
+        """
+        return Db.DB[collection].aggregate(pipeline)
+
+    @staticmethod
     def find_one(collection, query, projection={}):
         """
         Devuelve un documento que cumpla con el query
