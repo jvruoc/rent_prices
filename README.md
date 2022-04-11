@@ -6,7 +6,7 @@ Repositorio realizado para la práctica 1 de web scraping de la asignatura _Tipo
 
 El proyecto aquí presente busca trabajar con diversas páginas web de venta y alquiler de alojamientos para descargar los datos presentes. Concretamente se ha trabajado exclusivamente con el alquiler| centrándonos en los hechos acarreados de los últimos años en los que se ha visto un incremento de la demanda y por consecuencia de sus precios. La web seleccionada para la obtención de los datos se trata de  [Fotocasa](https://www.fotocasa.es/es/), pero la generación del código ha sido enfocada para que se pueda ampliar y desarrollar otras clases que trabajen con otras plataformas de similares contextos.
 
-A lo largo de este _README_ se puede observar el contenido concreto del repositorio, pero para una mayor descripción del conjunto de datos es posible acceder al informe situado en la carpeta _**pdf**_.
+A lo largo de este _README_ se puede observar el contenido concreto del repositorio, pero para una mayor descripción del conjunto de datos es posible acceder al [informe](https://github.com/jvruoc/rent_prices/blob/master/pdf/README.pdf) situado en la carpeta _**pdf**_.
 
 ### Objetivo 🚀
 
@@ -118,7 +118,7 @@ rent_prices/
 
 ### Ejecución
 
-La ejecución del programa tiene definidos diversos parámetros:
+La ejecución del programa tiene definidos dos ficheros el _main.py_ en el cual se descargar los datos y al cual se le pueden pasar diversos parámetros:
 
 * _--html_: Guarda el html de la página
 
@@ -129,6 +129,14 @@ La ejecución del programa tiene definidos diversos parámetros:
 * _--output_images_: Se define el directorio en Google Drive para guardar las imágenes.
 
 * _--start_page_: Inicializa el número de página para comenzar el scraping.
+
+Y el _extract.py_, que genera el fichero CSV a partir de los datos en la base de datos, este fichero dispone de los siguientes parámetros:
+
+* _--output_: Se define la ruta del fichero de salida.
+
+* _--categorical_values_: Definición de la ruta del fichero de información variables categóricas.
+
+* _--limit_: Especificación del número de registros a extraer (0=Todos).
 
 ## Resultado del proyecto
 
@@ -149,6 +157,7 @@ fc-162172800|28023|Flat|GroundFloorWithGarden|9202760159851|3|2022-02-24|2||||||
 fc-161358964|28023|Flat|Flat|9202760159851|3|2022-02-23|2|||||||1|6||1|2|90|False|True|False|False|False|0|15|1120|3|"[{'date': '2022-04-04', 'price': 1120}]"|2022-04-09 16:55:15.743000
 fc-162885268|28052|Flat|GroundFloorWithGarden|9202750766581|3|2022-03-10|2|||||||1|3||1|3|109|False|True|False|False|False|0|18|1095|3|"[{'date': '2022-04-04', 'price': 1095}]"|2022-04-09 16:56:23.579000|
 
+El conjunto completo de datos generado se puede encontrar en Zenodo a través del siguiente [enlace del DOI]()
 
 ## Autores ✒️
 

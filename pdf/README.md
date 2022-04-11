@@ -124,6 +124,7 @@ En este apartado se reflejan las contribuciones realizadas por cada uno de los a
 | Redacción de las respuestas | M.Ch., K. - V. R., J. |
 | Desarrollo del código: |
 |  - User-agent aleatorio | M.Ch., K. |
+|  - Aceptación de las cookies | V. R., J. |
 |  - Pruebas con proxys | V. R., J. |
 |  - Gestión de elementos dinámicos | M.Ch., K. - V. R., J. |
 |  - Descarga de imágenes y subida a Google Drive | M.Ch., K. |
