@@ -157,7 +157,7 @@ fc-162172800|28023|Flat|GroundFloorWithGarden|9202760159851|3|2022-02-24|2||||||
 fc-161358964|28023|Flat|Flat|9202760159851|3|2022-02-23|2|||||||1|6||1|2|90|False|True|False|False|False|0|15|1120|3|"[{'date': '2022-04-04', 'price': 1120}]"|2022-04-09 16:55:15.743000
 fc-162885268|28052|Flat|GroundFloorWithGarden|9202750766581|3|2022-03-10|2|||||||1|3||1|3|109|False|True|False|False|False|0|18|1095|3|"[{'date': '2022-04-04', 'price': 1095}]"|2022-04-09 16:56:23.579000|
 
-El conjunto completo de datos generado se puede encontrar en Zenodo a través del siguiente [enlace del DOI]()
+El conjunto completo de datos generado se puede encontrar en Zenodo a través del siguiente [enlace del DOI](https://doi.org/10.5281/zenodo.6445011)
 
 ## Autores ✒️
 
